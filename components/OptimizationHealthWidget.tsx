@@ -228,232 +228,253 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
     }, [accounts, displayMode, convertedHealthData]);
 
     return (
-        <div id="optimization-health-widget-container" className="bg-white rounded-[24px] border border-border-light shadow-sm flex flex-col overflow-hidden">
-            {/* Header with Sort Selector */}
-            <div className="p-5 pb-3 bg-white border-b border-border-light flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <div className="flex flex-col">
-                    <h3 className="text-sm font-bold text-text-strong flex items-center gap-1.5 leading-none">
-                        <span>Optimization summary</span>
-                        <InfoTooltip text="A consolidated view of optimization metrics, credit usage, and saving potentials across virtual organization accounts." position="bottom" />
-                    </h3>
+        <div id="optimization-metrics-deck" className="flex flex-col gap-4">
+            {/* Combined Metrics Card */}
+            <div id="combined-metrics-widget" className="bg-white dark:bg-slate-900 rounded-[24px] border border-border-light shadow-sm overflow-hidden">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-border-light dark:divide-white/5">
+                    {/* Widget 1: Total org spend */}
+                    <div id="metric-total-spend" className="p-6 flex flex-col justify-between min-h-[140px] hover:bg-slate-50/25 dark:hover:bg-slate-800/10 transition-colors">
+                        <div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Total spend of the Snowflake org</span>
+                                <InfoTooltip text="Year-to-date cumulative organization spend" position="bottom" />
+                            </div>
+                            <span className="text-2xl font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.totalSpend}</span>
+                        </div>
+                        <span className="text-[9.5px] text-text-muted block leading-snug">YTD cumulative organization spend</span>
+                    </div>
+
+                    {/* Widget 2: Average monthly spend */}
+                    <div id="metric-avg-spend" className="p-6 flex flex-col justify-between min-h-[140px] hover:bg-slate-50/25 dark:hover:bg-slate-800/10 transition-colors">
+                        <div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Average monthly spend</span>
+                                <InfoTooltip text="Rolling average monthly standard cost pool" position="bottom" />
+                            </div>
+                            <span className="text-2xl font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.averageMonthlySpend}</span>
+                        </div>
+                        <span className="text-[9.5px] text-text-muted block leading-snug">Rolling average standard cost pool</span>
+                    </div>
+
+                    {/* Widget 3: Accounts */}
+                    <div id="metric-accounts" className="p-6 flex flex-col justify-between min-h-[140px] hover:bg-slate-50/25 dark:hover:bg-slate-800/10 transition-colors">
+                        <div>
+                            <div className="flex items-center gap-1">
+                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Accounts</span>
+                                <InfoTooltip text="Active Snowflake virtual organization accounts" position="bottom" />
+                            </div>
+                            <span className="text-2xl font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.accountsCount}</span>
+                        </div>
+                        <span className="text-[9.5px] text-text-muted block leading-snug">Active virtual organization accounts</span>
+                    </div>
+
+                    {/* Widget 4: Total est. savings & recs */}
+                    <div 
+                        id="metric-est-savings"
+                        onClick={() => onNavigate('Enforcement Desk')}
+                        className="p-6 flex justify-between items-center cursor-pointer hover:bg-[#5829D6]/5 dark:hover:bg-[#818CF8]/5 transition-all group relative overflow-hidden min-h-[140px]"
+                    >
+                        <div className="flex flex-col h-full justify-between z-10 pr-2">
+                            <div>
+                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase group-hover:text-[#5829D6] dark:group-hover:text-[#818CF8] transition-colors inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+                                    <span>Total est. savings & recs</span>
+                                    <InfoTooltip text="Potential annual savings and total active recommendation triggers" position="bottom" />
+                                </span>
+                                <div className="flex items-baseline gap-2 mt-1.5">
+                                    <span className="text-2xl font-bold text-[#5829D6] dark:text-[#818CF8] font-sans tracking-tight">{stats.totalSavings}</span>
+                                    <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 font-sans">({stats.recommendationsCount} recs)</span>
+                                </div>
+                            </div>
+                            
+                            <div className="mt-1">
+                                <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#5829D6] text-white dark:bg-[#818CF8] dark:text-slate-950 font-extrabold text-[10px] rounded-full hover:bg-[#4d22bd] dark:hover:bg-[#727cf5] transition-all duration-200 select-none shadow-[0_2px_4px_rgba(88,41,214,0.15)] dark:shadow-[0_2px_4px_rgba(129,140,248,0.15)]">
+                                    View Enforcement Desk
+                                    <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
+                                </span>
+                            </div>
+                        </div>
+                        <div className="text-[#5829D6] dark:text-[#818CF8] opacity-10 group-hover:scale-105 group-hover:opacity-20 transition-all duration-300 shrink-0 absolute right-4 bottom-4">
+                            <IconSparkles className="w-10 h-10" />
+                        </div>
+                    </div>
                 </div>
+            </div>
 
-                <div className="flex items-center gap-4 self-stretch sm:self-auto justify-end">
-                    {/* Date filter dropdown */}
-                    <div className="relative">
-                        <button
-                            onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
-                            className="bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 border border-slate-200 dark:border-slate-700/80 focus:outline-none rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-xs font-semibold text-slate-705 transition-all duration-250 cursor-pointer shadow-xs min-w-[145px]"
-                        >
-                            <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
-                            <span className="text-slate-400 font-normal text-[11px] uppercase tracking-wider">Range:</span>
-                            <span className="truncate text-slate-705 dark:text-slate-205 font-bold">
-                                {dateFilter === '7' && 'Last 7 Days'}
-                                {dateFilter === '14' && 'Last 14 Days'}
-                                {dateFilter === '30' && 'Last 30 Days'}
-                                {dateFilter === 'custom' && `Custom (${customDays}d)`}
-                            </span>
-                            <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform ${isDateDropdownOpen ? 'rotate-180' : ''}`} />
-                        </button>
+            {/* Table Area Container */}
+            <div id="optimization-health-widget-container" className="bg-white rounded-[24px] border border-border-light shadow-sm flex flex-col overflow-hidden">
+                {/* Header with Sort Selector */}
+                <div className="p-5 pb-3 bg-white border-b border-border-light flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+                    <div className="flex flex-col">
+                        <h3 className="text-sm font-bold text-text-strong flex items-center gap-1.5 leading-none">
+                            <span>Optimization summary</span>
+                            <InfoTooltip text="A consolidated view of optimization metrics, credit usage, and saving potentials across virtual organization accounts." position="bottom" />
+                        </h3>
+                    </div>
 
-                        {isDateDropdownOpen && (
-                            <>
-                                {/* Invisible overlay to close dropdown on click outside */}
-                                <div className="fixed inset-0 z-10" onClick={() => setIsDateDropdownOpen(false)} />
-                                <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-lg z-20 py-1.5 overflow-hidden">
-                                    {[
-                                        { value: '7', label: 'Last 7 Days' },
-                                        { value: '14', label: 'Last 14 Days' },
-                                        { value: '30', label: 'Last 30 Days' },
-                                    ].map(opt => (
+                    <div className="flex items-center gap-4 self-stretch sm:self-auto justify-end">
+                        <div className="relative flex items-center gap-2">
+                            <ArrowUpDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
+                            <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Sort by:</span>
+                            
+                            <div className="relative">
+                                <button
+                                    onClick={() => setDropdownOpen(!dropdownOpen)}
+                                    className="flex items-center justify-between gap-2 text-xs font-bold text-slate-705 dark:text-slate-205 bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5829D6] dark:focus:ring-purple-500 cursor-pointer shadow-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-750 text-left min-w-[145px]"
+                                >
+                                    <span>{sortBy === 'total_credits' ? 'Total spend' : sortBy === 'percent_changes' ? 'Trend changes %' : 'Saving potential'}</span>
+                                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
+                                </button>
+                                
+                                {dropdownOpen && (
+                                    <>
+                                        {/* Invisible overlay to close dropdown on click outside */}
+                                        <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
+                                        
+                                        <div className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-xl z-20 overflow-hidden py-1 animate-in fade-in slide-in-from-top-1 duration-100">
+                                            {[
+                                                { value: 'total_credits', label: 'Total spend' },
+                                                { value: 'percent_changes', label: 'Trend changes %' },
+                                                { value: 'saving_potential', label: 'Saving potential' }
+                                            ].map((option) => (
+                                                <button
+                                                    key={option.value}
+                                                    onClick={() => {
+                                                        setSortBy(option.value as any);
+                                                        setDropdownOpen(false);
+                                                    }}
+                                                    className={`w-full text-left px-4 py-2 text-xs font-medium flex items-center justify-between transition-colors ${
+                                                        sortBy === option.value
+                                                            ? 'bg-slate-100/50 dark:bg-slate-800/50 text-[#5829D6] dark:text-purple-400 font-bold'
+                                                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/35'
+                                                    }`}
+                                                >
+                                                    <span>{option.label}</span>
+                                                    {sortBy === option.value && <Check className="w-3.5 h-3.5 text-[#5829D6] dark:text-purple-400 shrink-0" />}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Date filter dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setIsDateDropdownOpen(!isDateDropdownOpen)}
+                                className="bg-slate-50 dark:bg-slate-800/80 hover:bg-slate-100 border border-slate-200 dark:border-slate-700/80 focus:outline-none rounded-xl px-3 py-1.5 flex items-center justify-between gap-2 text-xs font-semibold text-slate-705 transition-all duration-250 cursor-pointer shadow-xs min-w-[145px]"
+                            >
+                                <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" />
+                                <span className="text-slate-400 font-normal text-[11px] uppercase tracking-wider">Range:</span>
+                                <span className="truncate text-slate-705 dark:text-slate-205 font-bold">
+                                    {dateFilter === '7' && 'Last 7 Days'}
+                                    {dateFilter === '14' && 'Last 14 Days'}
+                                    {dateFilter === '30' && 'Last 30 Days'}
+                                    {dateFilter === 'custom' && `Custom (${customDays}d)`}
+                                </span>
+                                <ChevronDown className={`h-3 w-3 text-slate-400 transition-transform ${isDateDropdownOpen ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {isDateDropdownOpen && (
+                                <>
+                                    {/* Invisible overlay to close dropdown on click outside */}
+                                    <div className="fixed inset-0 z-10" onClick={() => setIsDateDropdownOpen(false)} />
+                                    <div className="absolute right-0 mt-1.5 w-56 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-lg z-20 py-1.5 overflow-hidden">
+                                        {[
+                                            { value: '7', label: 'Last 7 Days' },
+                                            { value: '14', label: 'Last 14 Days' },
+                                            { value: '30', label: 'Last 30 Days' },
+                                        ].map(opt => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => {
+                                                    setDateFilter(opt.value as any);
+                                                    setIsDateDropdownOpen(false);
+                                                }}
+                                                className={`w-full text-left flex items-center justify-between px-4 py-2 text-xs transition-colors ${
+                                                    dateFilter === opt.value 
+                                                        ? 'bg-[#5829D6]/10 text-[#5829D6] dark:text-purple-400 font-bold' 
+                                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/35'
+                                                }`}
+                                            >
+                                                <span>{opt.label}</span>
+                                                {dateFilter === opt.value && (
+                                                    <Check className="w-3.5 h-3.5 text-[#5829D6] dark:text-purple-400 shrink-0" />
+                                                )}
+                                            </button>
+                                        ))}
+                                        
                                         <button
-                                            key={opt.value}
                                             onClick={() => {
-                                                setDateFilter(opt.value as any);
-                                                setIsDateDropdownOpen(false);
+                                                setDateFilter('custom');
                                             }}
-                                            className={`w-full text-left flex items-center justify-between px-4 py-2 text-xs transition-colors ${
-                                                dateFilter === opt.value 
+                                            className={`w-full text-left flex items-center justify-between px-4 py-2 text-xs border-t border-slate-100 dark:border-slate-800 transition-colors ${
+                                                dateFilter === 'custom' 
                                                     ? 'bg-[#5829D6]/10 text-[#5829D6] dark:text-purple-400 font-bold' 
                                                     : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/35'
                                             }`}
                                         >
-                                            <span>{opt.label}</span>
-                                            {dateFilter === opt.value && (
+                                            <span>Custom Range</span>
+                                            {dateFilter === 'custom' && (
                                                 <Check className="w-3.5 h-3.5 text-[#5829D6] dark:text-purple-400 shrink-0" />
                                             )}
                                         </button>
-                                    ))}
-                                    
-                                    <button
-                                        onClick={() => {
-                                            setDateFilter('custom');
-                                        }}
-                                        className={`w-full text-left flex items-center justify-between px-4 py-2 text-xs border-t border-slate-100 dark:border-slate-800 transition-colors ${
-                                            dateFilter === 'custom' 
-                                                ? 'bg-[#5829D6]/10 text-[#5829D6] dark:text-purple-400 font-bold' 
-                                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/35'
-                                        }`}
-                                    >
-                                        <span>Custom Range</span>
+
                                         {dateFilter === 'custom' && (
-                                            <Check className="w-3.5 h-3.5 text-[#5829D6] dark:text-purple-400 shrink-0" />
+                                            <div className="px-3 py-2 bg-slate-50 dark:bg-slate-950 mx-1.5 rounded-lg mt-1.5 border border-slate-100 dark:border-slate-800 space-y-2">
+                                                <div className="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                                                    <span>Days (2 - 31)</span>
+                                                    <span className="text-[#5829D6] dark:text-purple-400">{customDays} Days</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <input 
+                                                        type="range"
+                                                        min="2"
+                                                        max="31"
+                                                        value={customDays}
+                                                        onChange={(e) => setCustomDays(Number(e.target.value))}
+                                                        className="flex-1 h-1 bg-slate-200 dark:bg-slate-750 rounded-lg appearance-none cursor-pointer accent-[#5829D6]"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-1 justify-center">
+                                                    <button
+                                                        onClick={() => setCustomDays(prev => Math.max(2, prev - 1))}
+                                                        className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded font-black text-xs w-6 h-6 flex items-center justify-center text-slate-700 dark:text-slate-300 shadow-2xs cursor-pointer"
+                                                    >
+                                                        -
+                                                    </button>
+                                                    <input
+                                                        type="number"
+                                                        min="2"
+                                                        max="31"
+                                                        value={customDays}
+                                                        onChange={(e) => {
+                                                            const val = Math.min(31, Math.max(2, Number(e.target.value) || 2));
+                                                            setCustomDays(val);
+                                                        }}
+                                                        className="w-12 h-6 px-1 text-center bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded text-xs font-bold text-slate-805 dark:text-slate-105"
+                                                    />
+                                                    <button
+                                                        onClick={() => setCustomDays(prev => Math.min(31, prev + 1))}
+                                                        className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded font-black text-xs w-6 h-6 flex items-center justify-center text-[#111827] dark:text-slate-300 shadow-2xs cursor-pointer"
+                                                    >
+                                                        +
+                                                    </button>
+                                                </div>
+                                            </div>
                                         )}
-                                    </button>
-
-                                    {dateFilter === 'custom' && (
-                                        <div className="px-3 py-2 bg-slate-50 dark:bg-slate-950 mx-1.5 rounded-lg mt-1.5 border border-slate-100 dark:border-slate-800 space-y-2">
-                                            <div className="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-widest">
-                                                <span>Days (2 - 31)</span>
-                                                <span className="text-[#5829D6] dark:text-purple-400">{customDays} Days</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <input 
-                                                    type="range"
-                                                    min="2"
-                                                    max="31"
-                                                    value={customDays}
-                                                    onChange={(e) => setCustomDays(Number(e.target.value))}
-                                                    className="flex-1 h-1 bg-slate-200 dark:bg-slate-750 rounded-lg appearance-none cursor-pointer accent-[#5829D6]"
-                                                />
-                                            </div>
-                                            <div className="flex items-center gap-1 justify-center">
-                                                <button
-                                                    onClick={() => setCustomDays(prev => Math.max(2, prev - 1))}
-                                                    className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded font-black text-xs w-6 h-6 flex items-center justify-center text-slate-700 dark:text-slate-300 shadow-2xs cursor-pointer"
-                                                >
-                                                    -
-                                                </button>
-                                                <input
-                                                    type="number"
-                                                    min="2"
-                                                    max="31"
-                                                    value={customDays}
-                                                    onChange={(e) => {
-                                                        const val = Math.min(31, Math.max(2, Number(e.target.value) || 2));
-                                                        setCustomDays(val);
-                                                    }}
-                                                    className="w-12 h-6 px-1 text-center bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 rounded text-xs font-bold text-slate-805 dark:text-slate-105"
-                                                />
-                                                <button
-                                                    onClick={() => setCustomDays(prev => Math.min(31, prev + 1))}
-                                                    className="bg-white dark:bg-[#111827] border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 p-1 rounded font-black text-xs w-6 h-6 flex items-center justify-center text-slate-700 dark:text-slate-300 shadow-2xs cursor-pointer"
-                                                >
-                                                    +
-                                                </button>
-                                            </div>
-                                        </div>
-                                    )}
-                                </div>
-                            </>
-                        )}
-                    </div>
-
-                    <div className="relative flex items-center gap-2">
-                        <ArrowUpDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
-                        <span className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider">Sort by:</span>
-                        
-                        <div className="relative">
-                            <button
-                                onClick={() => setDropdownOpen(!dropdownOpen)}
-                                className="flex items-center justify-between gap-2 text-xs font-bold text-slate-705 dark:text-slate-205 bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#5829D6] dark:focus:ring-purple-500 cursor-pointer shadow-xs transition-all hover:bg-slate-100 dark:hover:bg-slate-750 text-left min-w-[145px]"
-                            >
-                                <span>{sortBy === 'total_credits' ? 'Total spend' : sortBy === 'percent_changes' ? 'Trend changes %' : 'Saving potential'}</span>
-                                <ChevronDown className={`w-3.5 h-3.5 text-slate-400 dark:text-slate-500 transition-transform duration-200 ${dropdownOpen ? 'rotate-180' : ''}`} />
-                            </button>
-                            
-                            {dropdownOpen && (
-                                <>
-                                    {/* Invisible overlay to close dropdown on click outside */}
-                                    <div className="fixed inset-0 z-10" onClick={() => setDropdownOpen(false)} />
-                                    
-                                    <div className="absolute right-0 mt-1.5 w-48 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-xl shadow-xl z-20 overflow-hidden py-1 animate-in fade-in slide-in-from-top-1 duration-100">
-                                        {[
-                                            { value: 'total_credits', label: 'Total spend' },
-                                            { value: 'percent_changes', label: 'Trend changes %' },
-                                            { value: 'saving_potential', label: 'Saving potential' }
-                                        ].map((option) => (
-                                            <button
-                                                key={option.value}
-                                                onClick={() => {
-                                                    setSortBy(option.value as any);
-                                                    setDropdownOpen(false);
-                                                }}
-                                                className={`w-full text-left px-4 py-2 text-xs font-medium flex items-center justify-between transition-colors ${
-                                                    sortBy === option.value
-                                                        ? 'bg-slate-100/50 dark:bg-slate-800/50 text-[#5829D6] dark:text-purple-400 font-bold'
-                                                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/35'
-                                                }`}
-                                            >
-                                                <span>{option.label}</span>
-                                                {sortBy === option.value && <Check className="w-3.5 h-3.5 text-[#5829D6] dark:text-purple-400 shrink-0" />}
-                                            </button>
-                                        ))}
                                     </div>
                                 </>
                             )}
                         </div>
-                    </div>
 
-                    <button className="text-text-muted hover:text-primary transition-colors p-1" title="Fullscreen">
-                        <Maximize2 className="w-3.5 h-3.5" />
-                    </button>
+                        <button className="text-text-muted hover:text-primary transition-colors p-1" title="Fullscreen">
+                            <Maximize2 className="w-3.5 h-3.5" />
+                        </button>
+                    </div>
                 </div>
-            </div>
 
-            {/* Org Metrics Banner */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-border-light dark:divide-white/5 bg-slate-50/40 border-b border-border-light">
-                <div className="p-5 flex flex-col justify-between">
-                    <div>
-                        <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Total spend of the Snowflake org</span>
-                        <span className="text-xl font-bold text-[#111827] dark:text-slate-100 mt-1 block font-sans tracking-tight">{stats.totalSpend}</span>
-                    </div>
-                    <span className="text-[9.5px] text-text-muted mt-2 block leading-snug">Year-to-date cumulative organization spend</span>
-                </div>
-                <div className="p-5 flex flex-col justify-between">
-                    <div>
-                        <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Average monthly spend</span>
-                        <span className="text-xl font-bold text-[#111827] dark:text-slate-100 mt-1 block font-sans tracking-tight">{stats.averageMonthlySpend}</span>
-                    </div>
-                    <span className="text-[9.5px] text-text-muted mt-2 block leading-snug">Rolling average monthly standard cost pool</span>
-                </div>
-                <div className="p-5 flex flex-col justify-between">
-                    <div>
-                        <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Accounts</span>
-                        <span className="text-xl font-bold text-[#111827] dark:text-slate-100 mt-1 block font-sans tracking-tight">{stats.accountsCount}</span>
-                    </div>
-                    <span className="text-[9.5px] text-text-muted mt-2 block leading-snug">Active Snowflake virtual organization accounts</span>
-                </div>
-                <div 
-                    onClick={() => onNavigate('Enforcement Desk')}
-                    className="p-5 flex justify-between items-center cursor-pointer hover:bg-slate-50/70 dark:hover:bg-slate-800/10 transition-colors group relative overflow-hidden"
-                >
-                    <div className="flex flex-col h-full justify-between z-10 pr-2">
-                        <div>
-                            <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase group-hover:text-[#5829D6] dark:group-hover:text-[#818CF8] transition-colors inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                <span>Total est. savings & recs</span>
-                                <InfoTooltip text="Potential annual savings and total active recommendation triggers" position="bottom" />
-                            </span>
-                            <div className="flex items-baseline gap-2 mt-1">
-                                <span className="text-xl font-bold text-[#5829D6] dark:text-[#818CF8] font-sans tracking-tight">{stats.totalSavings}</span>
-                                <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 font-sans">({stats.recommendationsCount} recs)</span>
-                            </div>
-                        </div>
-                        
-                        <div className="mt-3.5">
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#5829D6] text-white dark:bg-[#818CF8] dark:text-slate-950 font-extrabold text-[11px] rounded-full hover:bg-[#4d22bd] dark:hover:bg-[#727cf5] transition-all duration-200 select-none shadow-[0_2px_4px_rgba(88,41,214,0.15)] dark:shadow-[0_2px_4px_rgba(129,140,248,0.15)]">
-                                View Enforcement Desk
-                                <ArrowRight className="w-3.5 h-3.5" />
-                            </span>
-                        </div>
-                    </div>
-                    <div className="text-[#5829D6] dark:text-[#818CF8] opacity-20 pr-1 group-hover:scale-105 group-hover:opacity-40 transition-all duration-300 shrink-0">
-                        <IconSparkles className="w-6 h-6" />
-                    </div>
-                </div>
-            </div>
-
-            {/* Table Area */}
+                {/* Table Area */}
             <div className="overflow-x-auto w-full">
                 <table className="w-full text-left border-collapse min-w-[800px]">
                     <thead>
@@ -569,7 +590,8 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                 </table>
             </div>
         </div>
-    );
+    </div>
+);
 };
 
 export default OptimizationHealthWidget;

@@ -137,14 +137,6 @@ const BudgetStatusWidget: React.FC<{ onNavigate: (page: Page) => void }> = ({ on
             tagClass: 'bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-950/45 dark:text-amber-400 dark:border-amber-900/40', 
             desc: 'Exceeding 80% of budget',
             icon: <AlertTriangle className="w-6 h-6 stroke-[1.25]" />
-        },
-        { 
-            label: 'AI OPTIMIZATIONS', 
-            value: '2', 
-            tag: 'SMART', 
-            tagClass: 'bg-purple-50 text-purple-600 border border-purple-100 dark:bg-purple-950/40 dark:text-purple-400 dark:border-purple-900/40', 
-            desc: 'Potential credit savings',
-            icon: <Lightbulb className="w-6 h-6 stroke-[1.25]" />
         }
     ];
 
@@ -167,7 +159,7 @@ const BudgetStatusWidget: React.FC<{ onNavigate: (page: Page) => void }> = ({ on
             </div>
 
             {/* Column cards grid with responsive vertical divider borders */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-border-light dark:divide-white/5 bg-transparent">
+            <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border-light dark:divide-white/5 bg-transparent">
                 {budgetItems.map((item) => (
                     <div
                         key={item.label}
