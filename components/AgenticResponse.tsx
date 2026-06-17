@@ -63,11 +63,11 @@ const AgenticResponse: React.FC<AgenticResponseProps> = ({
                     )}
                     <div className="flex flex-wrap gap-3">
                         <AnimatePresence mode="wait">
-                            {status === 'assigned' ? (
+                             {status === 'assigned' ? (
                                 <motion.div 
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    className="flex items-center gap-2 px-4 py-2.5 bg-[#ECFDF5] border border-[#D1FAE5] rounded-lg text-[#065F46] font-bold text-[13px]"
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-[#ECFDF5] border border-[#D1FAE5] rounded-full text-[#065F46] font-bold text-[13px]"
                                 >
                                     <CheckCircle2 className="w-4 h-4" />
                                     Task assigned to {ownerName ? ownerName.split(' ')[0] : 'owner'}
@@ -75,7 +75,7 @@ const AgenticResponse: React.FC<AgenticResponseProps> = ({
                             ) : (
                                 <button 
                                     onClick={() => setStatus('assigned')}
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-[#6A38EB] hover:bg-[#5829D6] text-white rounded-lg font-bold text-[13px] transition-all active:scale-95 shadow-md shadow-[#6A38EB]/20"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-[#6A38EB] hover:bg-[#5829D6] text-white rounded-full font-bold text-[13px] transition-all active:scale-95 shadow-md shadow-[#6A38EB]/20"
                                 >
                                     <UserPlus className="w-4 h-4" />
                                     {ownerName ? `Assign to ${ownerName.split(' ')[0]}` : 'Assign task'}
@@ -84,11 +84,11 @@ const AgenticResponse: React.FC<AgenticResponseProps> = ({
                         </AnimatePresence>
 
                         <AnimatePresence mode="wait">
-                            {status === 'drafted' ? (
+                             {status === 'drafted' ? (
                                 <motion.div 
                                     initial={{ opacity: 0, scale: 0.9 }}
                                     animate={{ opacity: 1, scale: 1 }}
-                                    className="flex items-center gap-2 px-4 py-2.5 bg-[#ECFDF5] border border-[#D1FAE5] rounded-lg text-[#065F46] font-bold text-[13px]"
+                                    className="flex items-center gap-2 px-4 py-2.5 bg-[#ECFDF5] border border-[#D1FAE5] rounded-full text-[#065F46] font-bold text-[13px]"
                                 >
                                     <CheckCircle2 className="w-4 h-4" />
                                     Policy drafted
@@ -96,7 +96,7 @@ const AgenticResponse: React.FC<AgenticResponseProps> = ({
                             ) : (
                                 <button 
                                     onClick={() => setStatus('drafted')}
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#6A38EB] text-[#6A38EB] hover:bg-[#F5F2FF] rounded-lg font-bold text-[13px] transition-all active:scale-95"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#6A38EB] text-[#6A38EB] hover:bg-[#F5F2FF] rounded-full font-bold text-[13px] transition-all active:scale-95"
                                 >
                                     <ShieldCheck className="w-4 h-4" />
                                     Draft policy

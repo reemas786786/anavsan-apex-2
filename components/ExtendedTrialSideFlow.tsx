@@ -37,7 +37,7 @@ const ExtendedTrialSideFlow: React.FC<ExtendedTrialSideFlowProps> = ({ onCancel,
                     </div>
                     <h2 className="text-3xl font-black text-sidebar-topbar tracking-tight">Get extended access</h2>
                     <p className="text-sm text-text-secondary font-medium leading-relaxed max-w-sm mx-auto">
-                        If you are a SnowPro certified professional looking to leverage Anavsan, signup here to get extended trial for additional 14 days.
+                        If you are a SnowPro certified professional looking to use Anavsan, signup here to get extended trial for additional 14 days.
                     </p>
                 </div>
 

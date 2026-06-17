@@ -25,6 +25,8 @@ interface AIQuickAskPanelProps {
   isOpen: boolean;
   onClose: () => void;
   onOpenAgent: () => void;
+  account?: any;
+  currentScreen?: string;
 }
 
 interface Message {
@@ -33,7 +35,13 @@ interface Message {
   timestamp: string;
 }
 
-const AIQuickAskPanel: React.FC<AIQuickAskPanelProps> = ({ isOpen, onClose, onOpenAgent }) => {
+const AIQuickAskPanel: React.FC<AIQuickAskPanelProps> = ({ 
+  isOpen, 
+  onClose, 
+  onOpenAgent,
+  account,
+  currentScreen
+}) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -260,48 +268,245 @@ I have inspected the cost trajectory for active workloads. The ANAVSAN_WH wareho
                 >
                     How can I help you today?
                 </h2>
-                
-                {/* Subtitle */}
+                               {/* Subtitle */}
                 <p className="text-[#8E8EA8] dark:text-slate-400 mt-1 max-w-[280px] text-[10.5px] font-semibold opacity-90 leading-relaxed text-center">
                     Apex is ready to secure and optimize your Snowflake Data Cloud environment.
                 </p>
 
+                {/* Dedicated Screen Context Banner & Metadata */}
+                {account && (
+                  <div className="w-full mt-4 p-3 bg-[#F8F7FF] dark:bg-[#1E1B38] border border-[#E9E3FF] dark:border-[#332C66] rounded-xl flex flex-col text-left">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-[9px] uppercase font-black tracking-wider text-[#5829D6] dark:text-[#9F85FF]">
+                        Active Context: {account.name}
+                      </span>
+                      {currentScreen && (
+                        <span className="text-[9px] px-2 py-0.5 font-extrabold uppercase rounded-md bg-[#5829D6]/10 text-[#5829D6] dark:text-[#9F85FF] border border-[#5829D6]/15">
+                          {currentScreen}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* Compact layout grids for account metadata */}
+                    <div className="grid grid-cols-3 gap-2 mt-1.5 pt-2 border-t border-[#E9E3FF]/60 dark:border-[#332C66]/40 text-left">
+                      <div>
+                        <span className="text-[8px] block text-slate-405 dark:text-slate-400 font-bold uppercase tracking-wider leading-none">Warehouses</span>
+                        <span className="text-xs font-black text-slate-800 dark:text-white mt-0.5 block">{account.warehousesCount || 5} active</span>
+                      </div>
+                      <div>
+                        <span className="text-[8px] block text-slate-405 dark:text-slate-400 font-bold uppercase tracking-wider leading-none">Databases</span>
+                        <span className="text-xs font-black text-slate-800 dark:text-white mt-0.5 block">{account.databasesCount || (account.tablesCount ? '4 dbs' : '4 dbs')}</span>
+                      </div>
+                      <div>
+                        <span className="text-[8px] block text-slate-405 dark:text-slate-400 font-bold uppercase tracking-wider leading-none">Total Spend</span>
+                        <span className="text-xs font-black text-slate-800 dark:text-white mt-0.5 block">${account.cost?.toLocaleString() || '12,500'}</span>
+                      </div>
+                    </div>
+
+                    {/* Interactive Info helper */}
+                    <div className="mt-2 text-[9.5px] text-[#5829D6] dark:text-[#A78BFA] font-semibold bg-[#5829D6]/5 dark:bg-[#8B5CF6]/10 p-1.5 rounded-lg flex items-start gap-1.5 border border-[#5829D6]/10">
+                      <Info className="w-3 h-3 shrink-0 mt-0.5" />
+                      <span>
+                        {currentScreen?.includes('Warehouse') || currentScreen?.includes('Compute') ? "I've loaded active warehouse configurations for right-sizing recommendations." :
+                         currentScreen?.includes('Storage') || currentScreen?.includes('Unused') ? "Current storage analyzer: Ready to find unused tables or time-travel space hogs." :
+                         currentScreen?.includes('Quer') || currentScreen?.includes('Pattern') ? "Examining slow queries & repeated join patterns on active schemas." :
+                         currentScreen === 'Cortex' ? "Analysing LLM token consumption models and cost forecast models." :
+                         "I have loaded performance telemetry and metadata for this Snowflake instance."}
+                      </span>
+                    </div>
+                  </div>
+                )}
+
                 {/* Prompt Cards - 1-column layout for side panel */}
-                <div className="w-full mt-6 space-y-2.5">
-                  {[
-                    {
-                      category: 'ENFORCEMENT',
-                      title: 'Audit Accountability',
-                      description: "Identify the owner of last night's credit spike and route it.",
-                      prompt: "Identify the owner of last night's credit spike and route it to the Enforcement Desk.",
-                      icon: Shield,
-                      badgeColor: 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 border-red-100 dark:border-red-900',
-                    },
-                    {
-                      category: 'INTELLIGENCE',
-                      title: 'Cortex Workload Analysis',
-                      description: 'Predict AI token consumption and credit impact.',
-                      prompt: 'Predict AI token consumption and credit impact for my next LLM deployment using Cortex Workload Analysis.',
-                      icon: TrendingUp,
-                      badgeColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300 border-purple-100 dark:border-purple-900',
-                    },
-                    {
-                      category: 'COST ANALYSIS',
-                      title: 'Storage Intelligence',
-                      description: 'Detect unused time-travel snapshots to reduce bloat.',
-                      prompt: 'Detect unused time-travel snapshots and unoptimized tables to reduce bloat using Storage Intelligence.',
-                      icon: BarChart3,
-                      badgeColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900',
-                    },
-                    {
-                      category: 'OPTIMIZATION',
-                      title: 'Warehouse Right-Sizing',
-                      description: 'Analyze concurrency patterns to identify idle runtimes.',
-                      prompt: 'Analyze memory, cache, and concurrency patterns to identify over-provisioned or idle warehouses for Optimization.',
-                      icon: Zap,
-                      badgeColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900',
+                <div className="w-full mt-5 space-y-2.5">
+                  {((): any[] => {
+                    const defaultPrompts = [
+                      {
+                        category: 'ENFORCEMENT',
+                        title: 'Audit Accountability',
+                        description: "Identify the owner of last night's credit spike and route it.",
+                        prompt: "Identify the owner of last night's credit spike and route it to the Enforcement Desk.",
+                        icon: Shield,
+                        badgeColor: 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 border-red-100 dark:border-red-900',
+                      },
+                      {
+                        category: 'INTELLIGENCE',
+                        title: 'Cortex Workload Analysis',
+                        description: 'Predict AI token consumption and credit impact.',
+                        prompt: 'Predict AI token consumption and credit impact for my next LLM deployment using Cortex Workload Analysis.',
+                        icon: TrendingUp,
+                        badgeColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300 border-purple-100 dark:border-purple-900',
+                      },
+                      {
+                        category: 'COST ANALYSIS',
+                        title: 'Storage Intelligence',
+                        description: 'Detect unused time-travel snapshots to reduce bloat.',
+                        prompt: 'Detect unused time-travel snapshots and unoptimized tables to reduce bloat using Storage Intelligence.',
+                        icon: BarChart3,
+                        badgeColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900',
+                      },
+                      {
+                        category: 'OPTIMIZATION',
+                        title: 'Warehouse Right-Sizing',
+                        description: 'Analyze concurrency patterns to identify idle runtimes.',
+                        prompt: 'Analyze memory, cache, and concurrency patterns to identify over-provisioned or idle warehouses for Optimization.',
+                        icon: Zap,
+                        badgeColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900',
+                      }
+                    ];
+
+                    if (!currentScreen) return defaultPrompts;
+
+                    if (currentScreen.includes('Storage') || currentScreen.includes('Databases') || currentScreen.includes('Schemas') || currentScreen.includes('tables')) {
+                      return [
+                        {
+                          category: 'STORAGE OPTIMIZATION',
+                          title: 'Detect Unused Tables',
+                          description: "Identify tables with zero scans over the last 90 days to release cold storage.",
+                          prompt: `Show me all unused tables in account "${account?.name || 'this account'}" and estimate potential cost savings from deletion.`,
+                          icon: BarChart3,
+                          badgeColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900',
+                        },
+                        {
+                          category: 'DATA PROTECTION',
+                          title: 'PII Data Masking Validation',
+                          description: 'Verify if sensitive SSN, Email, or Phone columns are masked.',
+                          prompt: "Are there any unmasked SSN or Email columns detected in our schemas?",
+                          icon: Lock,
+                          badgeColor: 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 border-red-100 dark:border-red-900',
+                        },
+                        {
+                          category: 'TIME TRAVEL',
+                          title: 'Time-Travel Retention Configs',
+                          description: 'Analyze fail-safe limits and reduce unnecessary retention overheads.',
+                          prompt: "Recommend optimal transient table retention period configurations to reduce storage overhead.",
+                          icon: Shield,
+                          badgeColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300 border-purple-100 dark:border-purple-900',
+                        },
+                        {
+                          category: 'CLUSTERING',
+                          title: 'Automatic Clustering Advisor',
+                          description: 'Review table clustering keys and recommend optimized partition profiles.',
+                          prompt: "Which tables would benefit most from setting a custom cluster key?",
+                          icon: Zap,
+                          badgeColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900',
+                        }
+                      ];
                     }
-                  ].map((p, idx) => {
+
+                    if (currentScreen.includes('Warehouse') || currentScreen.includes('Compute') || currentScreen.includes('Serverless')) {
+                      return [
+                        {
+                          category: 'COMPUTE RIGHT-SIZING',
+                          title: 'Right-size Idle Warehouses',
+                          description: 'Identify virtual warehouses that can be downsized based on query memory profiles.',
+                          prompt: `Analyze warehouse load charts for "${account?.name || 'this account'}" and identify potential candidates for downsizing.`,
+                          icon: Zap,
+                          badgeColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/45 dark:text-emerald-350 border-emerald-100 dark:border-emerald-900',
+                        },
+                        {
+                          category: 'AUTO-SUSPEND POLICY',
+                          title: 'Reduce Auto-Suspend Overheads',
+                          description: 'Shorten idle auto-suspend timeouts to 60 seconds to stop credit leakage.',
+                          prompt: "Show me virtual warehouses with idle timeouts greater than 5 minutes and outline savings.",
+                          icon: Shield,
+                          badgeColor: 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 border-red-100 dark:border-red-900',
+                        },
+                        {
+                          category: 'AUTOSCALING',
+                          title: 'Multi-Cluster Scaling Advisor',
+                          description: 'Optimize load parameters and queue times with auto-scaling configuration rules.',
+                          prompt: "Does our peak compute load justify multi-cluster warehouses, and how do we configure it?",
+                          icon: TrendingUp,
+                          badgeColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300 border-purple-100 dark:border-purple-900',
+                        },
+                        {
+                          category: 'SPIKE TRACKING',
+                          title: 'Account Credit Spike Root-Cause',
+                          description: "Inspect query-level metadata for abnormal compute consumption peaks.",
+                          prompt: "Identify the top 5 costliest queries that ran over the past 24 hours.",
+                          icon: BarChart3,
+                          badgeColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900',
+                        }
+                      ];
+                    }
+
+                    if (currentScreen.includes('Quer') || currentScreen.includes('Pattern') || currentScreen.includes('Analysis') || currentScreen.includes('Repeat')) {
+                      return [
+                        {
+                          category: 'SQL OPTIMIZATION',
+                          title: 'Rewrite Expensive Queries',
+                          description: 'Scan SQL parameters to identify missing index pruning or Cartesian joins.',
+                          prompt: `Analyze expensive queries history in "${account?.name || 'this account'}" and rewrite slow Cartesian joins to optimized ANSI JOINs.`,
+                          icon: Zap,
+                          badgeColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900',
+                        },
+                        {
+                          category: 'REDUNDANT JOINS',
+                          title: 'Detect Repeated Queries',
+                          description: 'Identify identical query sequences running multiple times without caching benefits.',
+                          prompt: "Find highly repetitive queries that should be optimized using materialized views or server cache.",
+                          icon: Shield,
+                          badgeColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300 border-purple-100 dark:border-purple-900',
+                        },
+                        {
+                          category: 'PERFORMANCE ANALYSIS',
+                          title: 'Partition Pruning Diagnostics',
+                          description: 'Identify queries scanning millions of rows due to lack of metadata filters.',
+                          prompt: "Show me queries running full-table scans that lack effective date or region boundaries in their WHERE clause.",
+                          icon: BarChart3,
+                          badgeColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900',
+                        },
+                        {
+                          category: 'COST PROTECTION',
+                          title: 'Query Timeout Guardrails',
+                          description: "Establish custom statement-level execution bounds to prevent runaway queries.",
+                          prompt: "What is the recommended STATEMENT_TIMEOUT_IN_SECONDS parameter to prevent endless loops?",
+                          icon: Shield,
+                          badgeColor: 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 border-red-100 dark:border-red-900',
+                        }
+                      ];
+                    }
+
+                    if (currentScreen === 'Cortex') {
+                      return [
+                        {
+                          category: 'CORTEX AI COST',
+                          title: 'Token Optimization Guide',
+                          description: 'Analyze prompt styles to minimize LLM token bloat and control API costs.',
+                          prompt: `How can I scale my Cortex LLM deployment inside account "${account?.name || 'this account'}" safely under current budget parameters?`,
+                          icon: Zap,
+                          badgeColor: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-100 dark:border-emerald-900',
+                        },
+                        {
+                          category: 'LLM WORKLOADS',
+                          title: 'Cortex Model Performance',
+                          description: 'Compare execution cost overheads of different Snowflake-hosted LLM endpoints.',
+                          prompt: "Compare performance and token cost parameters of llama3-70b vs mistral-large in Cortex.",
+                          icon: TrendingUp,
+                          badgeColor: 'bg-purple-50 text-purple-600 dark:bg-purple-950/40 dark:text-purple-300 border-purple-100 dark:border-purple-900',
+                        },
+                        {
+                          category: 'SECURITY',
+                          title: 'Cortex Secure Isolation Rules',
+                          description: 'Ensure prompt injections are avoided using custom vector store structures.',
+                          prompt: "How can I configure safe prompt guidelines inside Snowflake Cortex workspaces?",
+                          icon: Lock,
+                          badgeColor: 'bg-red-50 text-red-600 dark:bg-red-950/40 dark:text-red-300 border-red-100 dark:border-red-900',
+                        },
+                        {
+                          category: 'VECTOR STORE',
+                          title: 'Vector Embedding Performance',
+                          description: 'Optimize semantic search speeds on unmasked columns.',
+                          prompt: "What is the optimal chunk sizing for vector index creation on customer logs?",
+                          icon: BarChart3,
+                          badgeColor: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-300 border-amber-100 dark:border-amber-900',
+                        }
+                      ];
+                    }
+
+                    return defaultPrompts;
+                  })().map((p, idx) => {
                     const CardIcon = p.icon;
                     return (
                       <motion.button
@@ -335,12 +540,42 @@ I have inspected the cost trajectory for active workloads. The ANAVSAN_WH wareho
                   <span className="text-[10px] font-black tracking-widest text-[#8E8EA8] dark:text-slate-500 uppercase mb-3 block leading-none select-none text-center">
                     QUICK ACTIONS
                   </span>
-                  <div className="flex flex-wrap items-center justify-center gap-1.5">
-                    {[
-                      { text: "Optimize compute clusters", icon: Zap },
-                      { text: "Summarize Cortex usage", icon: Brain },
-                      { text: "Check for PII violations", icon: Lock }
-                    ].map((chip, idx) => {
+                  <div className="flex flex-wrap items-center justify-center gap-1.5 flex-row">
+                    {((): any[] => {
+                      if (currentScreen?.includes('Storage') || currentScreen?.includes('Databases')) {
+                        return [
+                          { text: "Analyze unused tables", icon: BarChart3 },
+                          { text: "Optimize Fail-Safe storage", icon: Shield },
+                          { text: "Validate PII masking", icon: Lock }
+                        ];
+                      }
+                      if (currentScreen?.includes('Warehouse') || currentScreen?.includes('Compute')) {
+                        return [
+                          { text: "Optimize compute clusters", icon: Zap },
+                          { text: "Set idle timeouts to 60s", icon: Shield },
+                          { text: "Check warehouse runtimes", icon: TrendingUp }
+                        ];
+                      }
+                      if (currentScreen?.includes('Quer') || currentScreen?.includes('Pattern')) {
+                        return [
+                          { text: "Find expensive query scans", icon: BarChart3 },
+                          { text: "Diagnose Cartesian loops", icon: Zap },
+                          { text: "Compare repeated query cache", icon: Shield }
+                        ];
+                      }
+                      if (currentScreen === 'Cortex') {
+                        return [
+                          { text: "Summarize Cortex usage", icon: Brain },
+                          { text: "Cortex models benchmark", icon: TrendingUp },
+                          { text: "Check prompt token limit", icon: Lock }
+                        ];
+                      }
+                      return [
+                        { text: "Optimize compute clusters", icon: Zap },
+                        { text: "Summarize Cortex usage", icon: Brain },
+                        { text: "Check for PII violations", icon: Lock }
+                      ];
+                    })().map((chip, idx) => {
                       const ChipIcon = chip.icon;
                       return (
                         <motion.button

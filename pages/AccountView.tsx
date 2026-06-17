@@ -436,9 +436,17 @@ const AccountView: React.FC<AccountViewProps> = ({ account, accounts, onSwitchAc
         'Unused tables': { title: 'Unused tables', description: 'Identify and manage tables that are not being used.' },
         'Optimization': { title: 'Optimization', description: 'Overview of optimization opportunities and recommendations.' },
         'Cortex': { title: 'Cortex', description: 'Overview of Cortex AI services and consumption.' },
+        'Ask Apex': { title: 'Ask APEX', description: 'Interactive AI Assistant for Snowflake analysis.' },
     };
 
     const renderContent = () => {
+        if (activePage === 'Ask Apex') {
+            return (
+                <div className="flex-grow overflow-hidden flex flex-col h-full bg-background pb-2">
+                    <AIAgent account={account} onNavigate={handleSidebarPageChange} />
+                </div>
+            );
+        }
         if (selectedWarehouse) {
             return <WarehouseDetailView 
                 warehouse={selectedWarehouse} 

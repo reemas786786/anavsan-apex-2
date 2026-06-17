@@ -404,13 +404,13 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'COMPUTE_WH',
         severity: 'High',
         insightType: 'Rightsizing',
-        message: 'COMPUTE_WH is frequently reaching 90%+ peak utilization. Performance is constrained during peak ETL hours.',
-        detailedExplanation: 'Historical analysis over the last 14 days indicates that COMPUTE_WH is undersized for the current query volume. This results in significant queuing and degraded end-user experience during morning reporting windows.',
+        message: 'Warehouse COMPUTE_WH reaches 95% peak resource load during morning hours.',
+        detailedExplanation: 'Warehouse COMPUTE_WH reaches 95% peak resource load during morning hours. This high utilization causes query queuing and severe data delays. Upgrade warehouse size to Large to prevent data delay.',
         timestamp: new Date().toISOString(),
         accountName: 'Finance Prod',
         status: 'New',
         warehouseName: 'COMPUTE_WH',
-        suggestion: 'Upgrade warehouse size to LARGE during the 09:00 - 11:00 UTC window to eliminate query queuing.',
+        suggestion: 'Upgrade warehouse size to Large to prevent data delay.',
         metrics: { utilization: 92, creditsBefore: 1800, estimatedSavings: 0 }
     });
 
@@ -420,14 +420,14 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'q-9482103',
         severity: 'High Cost',
         insightType: 'Scan Optimization',
-        message: 'Query q-9482103 on COMPUTE_WH is performing full table scans on FACT_SALES.',
-        detailedExplanation: 'This query scans 450GB of data per execution. Because FACT_SALES is not clustered by EVENT_DATE, the query engine cannot prune partitions, leading to 10x higher costs than necessary.',
+        message: 'Query q-9482103 performed a full table scan on FACT_SALES table.',
+        detailedExplanation: 'Query q-9482103 performed a full table scan on FACT_SALES table. Scanning unclustered data blocks increases the monthly credit spend. Cluster table FACT_SALES by EVENT_DATE to reduce credit cost.',
         timestamp: new Date(Date.now() - 3600000).toISOString(),
         accountName: 'Finance Prod',
         status: 'New',
         warehouseName: 'COMPUTE_WH',
         userName: 'jane_doe',
-        suggestion: 'Apply a explicit filter on EVENT_DATE or implement a CLUSTERING KEY on (EVENT_DATE) for FACT_SALES.',
+        suggestion: 'Cluster table FACT_SALES by EVENT_DATE to reduce credit cost.',
         metrics: { creditsBefore: 4.5, estimatedSavings: 3.6, queryText: 'SELECT * FROM FACT_SALES WHERE EVENT_DATE >= "2023-01-01";' }
     });
 
@@ -437,12 +437,13 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'COMPUTE_WH',
         severity: 'Cost Saving',
         insightType: 'Cleanup',
-        message: 'COMPUTE_WH idle time is 22%. Auto-suspend is currently set to 600 seconds.',
+        message: 'Warehouse COMPUTE_WH remained idle without executing queries for ten minutes.',
+        detailedExplanation: 'Warehouse COMPUTE_WH remained idle without executing queries for ten minutes. Excessive idle time increases credit spend without providing database value. Reduce the auto suspend setting to sixty seconds to save credits.',
         timestamp: new Date(Date.now() - 7200000).toISOString(),
         accountName: 'Finance Prod',
         status: 'In Progress',
         warehouseName: 'COMPUTE_WH',
-        suggestion: 'Reduce AUTO_SUSPEND to 60 seconds. This is projected to save approximately 15% in monthly compute credits.',
+        suggestion: 'Reduce the auto suspend setting to sixty seconds to save credits.',
         metrics: { creditsBefore: 1800, estimatedSavings: 270, suspensionTime: '600s' }
     });
 
@@ -452,14 +453,14 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'q-9482115',
         severity: 'High',
         insightType: 'Scan Optimization',
-        message: 'Query q-9482115 is scanning 1.2TB of data due to lack of pruning on large table.',
-        detailedExplanation: 'The query filters on a non-indexed column, forcing a full scan of the CUSTOMER_ACTIVITY table. Implementing a search optimization service or clustering could reduce scan volume by 80%.',
+        message: 'Query q-9482115 scans one terabyte of data without partition pruning.',
+        detailedExplanation: 'Query q-9482115 scans one terabyte of data without partition pruning. Non prune queries force full table scans which inflates consumption costs. Prune partitions using clustering keys to limit scanned data blocks.',
         timestamp: new Date(Date.now() - 14400000).toISOString(),
         accountName: 'Account B',
         status: 'New',
         warehouseName: 'ANALYTICS_WH',
         userName: 'mike_de',
-        suggestion: 'Add a filter on the clustering key or enable Search Optimization Service for the filtered columns.',
+        suggestion: 'Prune partitions using clustering keys to limit scanned data blocks.',
         metrics: { creditsBefore: 12.8, estimatedSavings: 10.2, queryText: 'SELECT * FROM CUSTOMER_ACTIVITY WHERE REGION = "NORTH_AMERICA" AND ACTIVITY_TYPE = "PURCHASE";' }
     });
 
@@ -469,11 +470,12 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'LOG_TABLE_OLD',
         severity: 'Cost Saving',
         insightType: 'Cleanup',
-        message: 'Table LOG_TABLE_OLD has not been accessed in 180 days but occupies 2.4TB.',
+        message: 'Table LOG_TABLE_OLD has remained completely unaccessed for ninety consecutive days.',
+        detailedExplanation: 'Table LOG_TABLE_OLD has remained completely unaccessed for ninety consecutive days. Storing redundant data blocks incurs substantial cloud standard storage charges. Drop the inactive table to prevent monthly standard storage charges.',
         timestamp: new Date(Date.now() - 86400000).toISOString(),
         accountName: 'Finance Prod',
         status: 'New',
-        suggestion: 'Drop the table or move it to a lower-cost storage tier if the data is no longer needed for active analysis.',
+        suggestion: 'Drop the inactive table to prevent monthly standard storage charges.',
         metrics: { creditsBefore: 450, estimatedSavings: 450 }
     });
 
@@ -483,11 +485,12 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'STALE_USER_01',
         severity: 'High',
         insightType: 'Security',
-        message: 'User STALE_USER_01 has not logged in for 90 days but retains ACCOUNTADMIN privileges.',
+        message: 'User STALE_USER_01 maintains global accountadmin role without active session logins.',
+        detailedExplanation: 'User STALE_USER_01 maintains global accountadmin role without active session logins. Retaining unused administrative credentials introduces a critical account security vulnerability. Revoke the high administrative privileges to follow standard database guidelines.',
         timestamp: new Date(Date.now() - 172800000).toISOString(),
         accountName: 'Account C',
         status: 'New',
-        suggestion: 'Revoke ACCOUNTADMIN privileges or disable the user account to follow the principle of least privilege.',
+        suggestion: 'Revoke the high administrative privileges to follow standard database guidelines.',
     });
 
     // 2. Recommendations for other warehouses to ensure they also have context
@@ -497,12 +500,13 @@ export const recommendationsData: Recommendation[] = (function() {
         affectedResource: 'LOAD_WH',
         severity: 'High',
         insightType: 'Rightsizing',
-        message: 'LOAD_WH (X-Small) is consistently at 100% peak utilization.',
+        message: 'Warehouse LOAD_WH operates at one hundred percent peak resource capacity.',
+        detailedExplanation: 'Warehouse LOAD_WH operates at one hundred percent peak resource capacity. Insufficient resource capacity duplicates ingestion queue time and delays processing. Scale the size to Small to reduce average stream latency.',
         timestamp: new Date().toISOString(),
         accountName: 'Finance Prod',
         status: 'New',
         warehouseName: 'LOAD_WH',
-        suggestion: 'Consider scaling to SMALL to reduce ingestion latency for high-frequency streams.',
+        suggestion: 'Scale the size to Small to reduce average stream latency.',
         metrics: { utilization: 100, creditsBefore: 600 }
     });
 
@@ -512,19 +516,46 @@ export const recommendationsData: Recommendation[] = (function() {
         const warehouse = warehouses[i % warehouses.length];
         const account = accounts[i % accounts.length];
         const severity = i % 5 === 0 ? 'High' : i % 3 === 0 ? 'Cost Saving' : 'Medium';
-        
+        const typeName = type === 'Warehouse' ? warehouse : type === 'Query' ? `q-9482${100+i}` : `${type}_${i}`;
+
+        const fact = type === 'Warehouse' 
+            ? `Warehouse ${typeName} consumes excess virtual compute credits on ${account} database.`
+            : type === 'Query'
+            ? `Query ${typeName} runs slow because it scans unclustered database partitions.`
+            : type === 'Storage'
+            ? `Storage table ${typeName} contains uncompressed historical records on ${account} database.`
+            : `Resource ${typeName} has high active metrics on ${account} database.`;
+
+        const impact = type === 'Warehouse'
+            ? `High virtual compute consumption elevates active costs without performance gains.`
+            : type === 'Query'
+            ? `Inefficient queries increase compute consumption and degrade data pipeline execution.`
+            : type === 'Storage'
+            ? `Unused historical databases double secondary fail safe storage credit costs.`
+            : `Active resource consumption exceeds expected threshold limits for this segment.`;
+
+        const action = type === 'Warehouse'
+            ? `Resize virtual computing configuration down to reduce active billing rates.`
+            : type === 'Query'
+            ? `Implement explicit table filtering clauses to lower scanned data volume.`
+            : type === 'Storage'
+            ? `Drop uncompressed table partitions to lower monthly cloud storage fees.`
+            : `Modify the active resource rules to match database configuration criteria.`;
+
         recs.push({
             id: `REC-${String(i).padStart(3, '0')}`,
             resourceType: type,
-            affectedResource: type === 'Warehouse' ? warehouse : type === 'Query' ? `q-9482${100+i}` : `${type}_${i}`,
+            affectedResource: typeName,
             severity: severity as SeverityImpact,
             insightType: insightTypes[i % insightTypes.length],
-            message: `Identified potential ${insightTypes[i % insightTypes.length].toLowerCase()} for ${type} in ${account}.`,
+            message: fact,
+            detailedExplanation: `${fact} ${impact} ${action}`,
             timestamp: new Date(Date.now() - i * 3600000).toISOString(),
             accountName: account,
             status: i % 5 === 0 ? 'In Progress' : i % 4 === 0 ? 'Resolved' : 'New',
             warehouseName: warehouse,
-            userName: i % 2 === 0 ? 'jane_doe' : 'mike_de'
+            userName: i % 2 === 0 ? 'jane_doe' : 'mike_de',
+            suggestion: action
         });
     }
     return recs;

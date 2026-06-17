@@ -131,6 +131,9 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({ onNavigate }) => {
             promptText = `Configure a Dynamic Data Masking policy on the unmasked Email and SSN columns detected in the LOGISTICS_DATA table to secure sensitive PII credentials immediately.`;
         }
 
+        // Filter out the selected directive card so it's removed immediately
+        setDirectives(prev => prev.filter(d => d.id !== directive.id));
+
         // Save trigger prompt securely so AIAgent can fetch it immediately on load
         localStorage.setItem('apex_initial_chat_prompt', promptText);
         

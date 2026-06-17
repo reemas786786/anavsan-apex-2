@@ -147,29 +147,6 @@ export const DiagnosticWizardFlow: React.FC<DiagnosticWizardFlowProps> = ({
 
     return (
         <div className="w-full max-w-2xl mx-auto space-y-4 font-sans text-[14px]">
-            {/* CARD HEADER: APEX AI Live diagnostic */}
-            <div className="bg-[#6A38EB]/5 border border-[#6A38EB]/20 rounded-2xl px-4 py-3 flex items-center justify-between shadow-xs">
-                <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-lg bg-[#6A38EB] flex items-center justify-center text-white shrink-0 shadow-[0_2px_8px_rgba(106,56,235,0.25)]">
-                        <Sparkles className="w-4 h-4 animate-[pulse_2s_infinite]" />
-                    </div>
-                    <div>
-                        <h4 className="text-xs font-extrabold text-[#111827] flex items-center gap-1.5 leading-none">
-                            <span>APEX AI Assistant</span>
-                            <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-[#6A38EB]/10 text-[#6A38EB] font-black">
-                                Diagnostic Mode
-                            </span>
-                        </h4>
-                        <p className="text-[10px] text-gray-500 font-semibold leading-none mt-1">
-                            Interactive diagnostic sequence • ID: {activeRecId || 'APX-214'}
-                        </p>
-                    </div>
-                </div>
-                <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
-                    Anavsan Engine
-                </div>
-            </div>
-
             {/* STEP 0: DETECTED INEFFICIENCY */}
             <motion.div 
                 initial={{ opacity: 0, y: 10 }}

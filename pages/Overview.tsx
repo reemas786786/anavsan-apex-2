@@ -718,7 +718,7 @@ const SpendTrendForecastWidget: React.FC<{
                         {/* Sub Metric List */}
                         <div className="space-y-3">
                             <div className="flex justify-between items-center group">
-                                <span className="text-xs text-text-secondary font-medium">MTD Spend (Last {historicalDays}D)</span>
+                                <span className="text-xs text-text-secondary font-medium">Current spend (4 Feb - 3 Mar)</span>
                                 <span className="text-sm font-bold text-text-strong group-hover:text-primary transition-colors font-sans">{formatValue(mtdValue)}</span>
                             </div>
                             <div className="flex justify-between items-center group border-t border-border-light dark:border-white/5 pt-2.5">
@@ -730,7 +730,7 @@ const SpendTrendForecastWidget: React.FC<{
                             </div>
                             <div className="border-t border-border-light dark:border-white/5 pt-2.5">
                                 <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-text-secondary font-medium">Predicted Budget Utilization</span>
+                                    <span className="text-xs text-text-secondary font-medium">Budget utilization</span>
                                     <span className="text-xs font-bold text-text-strong font-sans">{budgetPct}%</span>
                                 </div>
                                 <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden flex">

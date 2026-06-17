@@ -15,6 +15,7 @@ import { recommendationsData } from '../data/dummyData';
 
 export interface AIAgentProps {
     onNavigate?: (page: string) => void;
+    account?: any;
 }
 
 // --- TYPES ---
@@ -212,8 +213,22 @@ const RecommendedActionCard: React.FC<{
     onPromptClick: (prompt: string) => void;
     onNavigate?: (page: string) => void;
 }> = ({ recId, recTitle, affectedResource, accountName, severity, savings, userContext, onPromptClick, onNavigate }) => {
+    const [isDismissed, setIsDismissed] = useState(false);
+
+    if (isDismissed) {
+        return null;
+    }
+
     return (
-        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-rose-200 dark:border-rose-900 shadow-[0_4px_16px_rgba(244,63,94,0.06)] p-4 max-w-2xl mt-4 select-none">
+        <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-rose-200 dark:border-rose-900 shadow-[0_4px_16px_rgba(244,63,94,0.06)] p-4 max-w-2xl mt-4 select-none relative group/rec-card">
+            <button
+                onClick={() => setIsDismissed(true)}
+                className="absolute top-2 right-2 p-1 rounded-full text-slate-450 hover:text-slate-700 hover:bg-slate-100 dark:hover:bg-zinc-800 transition-all cursor-pointer z-30"
+                title="Dismiss card"
+                aria-label="Dismiss card"
+            >
+                <Plus className="w-3.5 h-3.5 rotate-45" />
+            </button>
             <div className="bg-[#FFF8F8] dark:bg-[#1A1012] p-4 rounded-xl border border-rose-100 dark:border-rose-950 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition-all hover:shadow-xs">
                 <div className="space-y-1 flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -234,6 +249,7 @@ const RecommendedActionCard: React.FC<{
                 
                 <button
                     onClick={() => {
+                        setIsDismissed(true);
                         onPromptClick(`[diagnostic-wizard-flow:${recId}|${recTitle}|${affectedResource}|${accountName}|${severity}|${savings}|${userContext}]`);
                     }}
                     className="w-full md:w-auto shrink-0 flex items-center justify-center gap-1 bg-rose-600 hover:bg-rose-700 text-white px-4 py-1.5 rounded-full text-xs font-bold transition-all shadow-xs active:scale-[0.98] select-none"
@@ -778,7 +794,7 @@ const SuggestionChips: React.FC<{ onChipClick: (text: string) => void }> = ({ on
 
 
 // --- MAIN COMPONENT ---
-const AIAgent: React.FC<AIAgentProps> = ({ onNavigate }) => {
+const AIAgent: React.FC<AIAgentProps> = ({ onNavigate, account }) => {
     const [chats, setChats] = useState<ChatSession[]>([]);
     const [activeChatId, setActiveChatId] = useState<string | null>(null);
     const [input, setInput] = useState('');
@@ -999,7 +1015,9 @@ const AIAgent: React.FC<AIAgentProps> = ({ onNavigate }) => {
             title: 'New Chat',
             messages: [{ 
                 role: 'model', 
-                text: 'Hello! I am APEX. How can I help you analyze your data cloud today?',
+                text: account 
+                    ? `Hello! I am APEX, initialized for account **${account.name}** (${account.identifier || 'Snowflake Account'}). I have loaded metadata for **${account.databasesCount || 4} databases**, **${account.warehousesCount || 5} active warehouses**, and performance telemetry. How can I help you analyze your database or answer questions about Snowflake today?`
+                    : 'Hello! I am APEX. How can I help you analyze your data cloud today?',
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'})
             }],
         };
@@ -1114,6 +1132,17 @@ const AIAgent: React.FC<AIAgentProps> = ({ onNavigate }) => {
                     config: {
                         systemInstruction: `
 Act as "Apex." You are a highly skilled technical partner for data cloud management.
+
+${account ? `The user is currently asking questions in the context of their selected Snowflake Account:
+- Name: ${account.name}
+- Identifier/Org: ${account.identifier || 'Unknown Org'}
+- Role: ${account.role || 'ACCOUNTADMIN'}
+- Databases Count: ${account.databasesCount || 4}
+- Warehouses Count: ${account.warehousesCount || 5}
+- Users Count: ${account.usersCount || 24}
+- Queries Count: ${account.queriesCount || '45k'}
+- Storage: ${account.storageGB || 1000} GB
+Be helpful, professional, and knowledgeable about Snowflake specific features, queries, SQL, performance parameters (like clustering, micro-partitions, virtual warehouses, auto-suspension, caching, query history representation, and secure views). Let the user know you have metadata loaded for this account.` : `The user can ask general questions about Snowflake, its SQL, clustering, micro-partitions, cost optimization, warehousing, schema design, secure views, etc.`}
 
 ### RULES FOR CONVERSATION:
 1. BREVITY: Keep messages short. Use 2 or 3 bubbles instead of one long one. Separate bubbles with '---' on a new line.

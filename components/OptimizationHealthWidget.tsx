@@ -239,7 +239,7 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                                 <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Total spend of the Snowflake org</span>
                                 <InfoTooltip text="Year-to-date cumulative organization spend" position="bottom" />
                             </div>
-                            <span className="text-2xl font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.totalSpend}</span>
+                            <span className="text-[20px] font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.totalSpend}</span>
                         </div>
                         <span className="text-[9.5px] text-text-muted block leading-snug">YTD cumulative organization spend</span>
                     </div>
@@ -251,7 +251,7 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                                 <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Average monthly spend</span>
                                 <InfoTooltip text="Rolling average monthly standard cost pool" position="bottom" />
                             </div>
-                            <span className="text-2xl font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.averageMonthlySpend}</span>
+                            <span className="text-[20px] font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.averageMonthlySpend}</span>
                         </div>
                         <span className="text-[9.5px] text-text-muted block leading-snug">Rolling average standard cost pool</span>
                     </div>
@@ -263,7 +263,7 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                                 <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Accounts</span>
                                 <InfoTooltip text="Active Snowflake virtual organization accounts" position="bottom" />
                             </div>
-                            <span className="text-2xl font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.accountsCount}</span>
+                            <span className="text-[20px] font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.accountsCount}</span>
                         </div>
                         <span className="text-[9.5px] text-text-muted block leading-snug">Active virtual organization accounts</span>
                     </div>
@@ -281,7 +281,7 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                                     <InfoTooltip text="Potential annual savings and total active recommendation triggers" position="bottom" />
                                 </span>
                                 <div className="flex items-baseline gap-2 mt-1.5">
-                                    <span className="text-2xl font-bold text-[#5829D6] dark:text-[#818CF8] font-sans tracking-tight">{stats.totalSavings}</span>
+                                    <span className="text-[20px] font-bold text-[#5829D6] dark:text-[#818CF8] font-sans tracking-tight">{stats.totalSavings}</span>
                                     <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 font-sans">({stats.recommendationsCount} recs)</span>
                                 </div>
                             </div>

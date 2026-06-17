@@ -190,6 +190,11 @@ export const IconCube: React.FC<{ className?: string }> = ({ className }) => <Bo
 // --- Navigation Data ---
 export const accountNavItems = [
     {
+        name: 'Ask Apex',
+        icon: IconMessageSquare,
+        children: []
+    },
+    {
         name: 'Account overview',
         icon: IconOverview,
         children: []
@@ -225,24 +230,6 @@ export const accountNavItems = [
         children: []
     },
     {
-        name: 'Query analyzer',
-        label: 'Analyzer',
-        icon: IconSearch,
-        children: []
-    },
-    {
-        name: 'Query optimizer',
-        label: 'Optimizer',
-        icon: IconSparkleStroke,
-        children: []
-    },
-    {
-        name: 'Query simulator',
-        label: 'Simulator',
-        icon: IconBeaker,
-        children: []
-    },
-    {
         name: 'Query prompt generator',
         label: 'Prompt generator',
         icon: IconWand,
@@ -252,9 +239,8 @@ export const accountNavItems = [
 
 export const NAV_ITEMS_TOP: NavItem[] = [
     { name: 'Ask Apex', icon: IconMessageSquare, label: 'Ask APEX' },
-    { name: 'Cost Intelligence', icon: IconDashboard },
-    { name: 'Dashboards', icon: IconCloudOverview },
     { name: 'Enforcement Desk', icon: IconLightbulb },
+    { name: 'Cost Intelligence', icon: IconDashboard },
     { name: 'Operations', icon: IconBeaker },
     { name: 'Trigger', icon: IconBolt },
     { name: 'Integrations', icon: IconAdjustments, label: 'Tools' },
@@ -262,6 +248,7 @@ export const NAV_ITEMS_TOP: NavItem[] = [
 ];
 
 export const NAV_ITEMS_BOTTOM: NavItem[] = [
+    { name: 'Dashboards', icon: IconCloudOverview },
     { name: 'Accounts', icon: IconUser },
     { name: 'Budgets & alerts', icon: IconBell },
     {

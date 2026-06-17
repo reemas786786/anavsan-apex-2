@@ -924,7 +924,13 @@ const App: React.FC = () => {
         )}
         <AnimatePresence>
           {isQuickAskOpen && (
-            <AIQuickAskPanel isOpen={isQuickAskOpen} onClose={() => setIsQuickAskOpen(false)} onOpenAgent={() => { setIsQuickAskOpen(false); handleSetActivePage('Ask Apex'); }} />
+            <AIQuickAskPanel 
+              isOpen={isQuickAskOpen} 
+              onClose={() => setIsQuickAskOpen(false)} 
+              onOpenAgent={() => { setIsQuickAskOpen(false); handleSetActivePage('Ask Apex'); }} 
+              account={selectedAccount}
+              currentScreen={selectedAccount ? accountViewPage : undefined}
+            />
           )}
         </AnimatePresence>
       </div>

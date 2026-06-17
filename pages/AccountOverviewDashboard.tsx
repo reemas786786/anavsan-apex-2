@@ -1035,9 +1035,9 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
     const [warehouseTimeframe, setWarehouseTimeframe] = useState('2 Weeks');
     const [warehouseStatusFilter, setWarehouseStatusFilter] = useState('All');
     const [warehouseUserFilter, setWarehouseUserFilter] = useState('MANJU');
-    const [warehouseDescription, setWarehouseDescription] = useState('Warehouse utilized for data warehousing, heavy analytical transformations, and ingestion pipelines.');
+    const [warehouseDescription, setWarehouseDescription] = useState('Warehouse configured for data warehousing, heavy analytical transformations, and ingestion pipelines.');
     const [isEditingWarehouseDescription, setIsEditingWarehouseDescription] = useState(false);
-    const [tempWarehouseDescription, setTempWarehouseDescription] = useState('Warehouse utilized for data warehousing, heavy analytical transformations, and ingestion pipelines.');
+    const [tempWarehouseDescription, setTempWarehouseDescription] = useState('Warehouse configured for data warehousing, heavy analytical transformations, and ingestion pipelines.');
     const [warehouseActiveDropdown, setWarehouseActiveDropdown] = useState<'status' | 'user' | 'timeframe' | null>(null);
 
     // Scroll page to top when a specific resource is selected or details panel is toggled to make sure details screen is visible "from the top"
@@ -2279,7 +2279,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                 spend of account
                             </span>
                             <div className="flex items-center gap-2.5 mt-2.5">
-                                <span className="text-3xl font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
+                                <span className="text-[20px] font-extrabold text-slate-900 dark:text-slate-50 font-sans tracking-tight">
                                     25.2
                                 </span>
                                 <span className="text-[9.5px] font-black tracking-wider uppercase px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-md border border-emerald-200/40 dark:border-emerald-900/50 flex items-center gap-1">
@@ -2298,9 +2298,6 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                             <div className="flex justify-between items-start mb-2">
                                 <span className="text-[11px] font-bold text-slate-450 dark:text-slate-400 uppercase tracking-wider block">
                                     Budget status & limit
-                                </span>
-                                <span className="text-[8.5px] font-extrabold px-1.5 py-0.5 rounded bg-purple-100 dark:bg-purple-950/40 text-[#5829D6] dark:text-purple-300 uppercase font-mono tracking-wider">
-                                    Account active
                                 </span>
                             </div>
                             
@@ -2349,33 +2346,6 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                                         style={{ width: `${percentageUsed}%` }} 
                                                     />
                                                 </div>
-                                                <div className="flex items-center justify-between gap-1.5 mt-1">
-                                                    <div className="flex gap-1">
-                                                        <button 
-                                                            onClick={() => setBudgetLimit(prev => Math.max(10, prev - 5))}
-                                                            className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-[9px] font-extrabold text-slate-600 dark:text-slate-300 transition-colors shadow-xs cursor-pointer select-none"
-                                                            title="Decrease limit"
-                                                        >
-                                                            -5cr
-                                                        </button>
-                                                        <button 
-                                                            onClick={() => setBudgetLimit(prev => Math.min(200, prev + 5))}
-                                                            className="px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-[9px] font-extrabold text-slate-600 dark:text-slate-300 transition-colors shadow-xs cursor-pointer select-none"
-                                                            title="Increase limit"
-                                                        >
-                                                            +5cr
-                                                        </button>
-                                                    </div>
-                                                    <button 
-                                                        onClick={() => setBudgetActivated(false)}
-                                                        className="text-[9.5px] font-bold text-slate-400 hover:text-rose-500 underline transition-colors cursor-pointer"
-                                                    >
-                                                        Mute budget
-                                                    </button>
-                                                </div>
-                                                <div className="text-[9.5px] text-slate-400 dark:text-slate-500 font-black mt-2 font-mono truncate max-w-full">
-                                                    Scope: {account?.name || 'Primary root'}
-                                                </div>
                                             </>
                                         );
                                     })()}
@@ -2413,7 +2383,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                             </div>
 
                             <div className="flex items-baseline gap-2 mt-2.5 flex-wrap">
-                                <span className="text-2xl sm:text-3xl font-extrabold text-[#5829D6] dark:text-[#818CF8] tracking-tight leading-none font-sans">
+                                <span className="text-[20px] font-extrabold text-[#5829D6] dark:text-[#818CF8] tracking-tight leading-none font-sans">
                                     {dateFilterSavings.value}
                                 </span>
                                 <span className="text-xs sm:text-sm font-semibold text-[#8E8EA8] dark:text-[#9A9AB2]">
@@ -2466,7 +2436,10 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                         : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-white/40 dark:hover:bg-[#111827]/30'
                                 }`}
                             >
-                                {tab === 'SPEND TREND' ? 'spend trend' : tab.toLowerCase()}
+                                {tab === 'SPEND TREND' ? 'total spend' : 
+                                 tab === 'WAREHOUSE SPEND' ? 'compute spend' : 
+                                 tab === 'STORAGE GROWTH' ? 'storage' : 
+                                 tab.toLowerCase()}
                             </button>
                         ))}
                     </div>
@@ -2475,7 +2448,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                 {/* Chart and detailed breakdown split layout */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6 items-stretch">
                     {/* Recharts Area / Line trends chart (Left, span 7) */}
-                    <div id="spend-trend-graph-parent" className="lg:col-span-7 flex flex-col pr-1 h-[350px] relative">
+                    <div id="spend-trend-graph-parent" className="lg:col-span-7 flex flex-col pr-1 h-[230px] relative">
                         <ResponsiveContainer width="100%" height="100%">
                             <AreaChart 
                                 data={currentTrendChartData}
@@ -2557,16 +2530,16 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                             </span>
  
                             {/* Breakdown row elements */}
-                            <div className="space-y-4">
+                            <div className="space-y-2">
                                 {/* Compute Row */}
                                 <div 
                                     onClick={() => handleTrendBreakdownClick('Compute')}
-                                    className="flex flex-col border-b border-rose-50/10 dark:border-slate-800/40 pb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1.5 rounded-xl transition duration-155"
+                                    className="flex flex-col border-b border-rose-50/10 dark:border-slate-800/40 pb-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1 rounded-xl transition duration-155"
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <span className="text-[12.5px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
-                                                {activeTrendTab === 'SPEND TREND' ? 'COMPUTE WAREHOUSE SPEND' :
+                                                {activeTrendTab === 'SPEND TREND' ? 'COMPUTE' :
                                                  activeTrendTab === 'WAREHOUSE SPEND' ? 'Batch Processing Jobs' :
                                                  activeTrendTab === 'DATA TRANSFER' ? 'Sync Pipe Execution' : 'Table Standard Logs'}
                                             </span>
@@ -2597,12 +2570,12 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                 {/* Storage Row */}
                                 <div 
                                     onClick={() => handleTrendBreakdownClick('Storage')}
-                                    className="flex flex-col border-b border-rose-50/10 dark:border-slate-800/40 pb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1.5 rounded-xl transition duration-155"
+                                    className="flex flex-col border-b border-rose-50/10 dark:border-slate-800/40 pb-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1 rounded-xl transition duration-155"
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <span className="text-[12.5px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
-                                                {activeTrendTab === 'SPEND TREND' ? 'STORAGE SERVICE COST' :
+                                                {activeTrendTab === 'SPEND TREND' ? 'STORAGE' :
                                                  activeTrendTab === 'WAREHOUSE SPEND' ? 'Metadata Service Cost' :
                                                  activeTrendTab === 'DATA TRANSFER' ? 'Overhead Store Buffer' : 'Table Volume Storage'}
                                             </span>
@@ -2633,12 +2606,12 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                 {/* Cloud Services row */}
                                 <div 
                                     onClick={() => handleTrendBreakdownClick('Transfer')}
-                                    className="flex flex-col border-b border-rose-50/10 dark:border-slate-800/40 pb-3 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1.5 rounded-xl transition duration-155"
+                                    className="flex flex-col border-b border-rose-50/10 dark:border-slate-800/40 pb-2 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1 rounded-xl transition duration-155"
                                 >
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <span className="text-[12.5px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
-                                                {activeTrendTab === 'SPEND TREND' ? 'CLOUD SERVICES CREDIT' :
+                                                {activeTrendTab === 'SPEND TREND' ? 'CLOUD SERVICES' :
                                                  activeTrendTab === 'WAREHOUSE SPEND' ? 'Security Services Credit' :
                                                  activeTrendTab === 'DATA TRANSFER' ? 'Bandwidth Control plane' : 'Fail-Safe Protection'}
                                             </span>
@@ -2669,7 +2642,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                 {/* Peak Spending row */}
                                 <div 
                                     onClick={() => handleTrendBreakdownClick('Compute')}
-                                    className="flex items-center justify-between border-b border-rose-50/10 dark:border-slate-800/40 pb-2.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1.5 rounded-xl transition duration-155"
+                                    className="flex items-center justify-between border-b border-rose-50/10 dark:border-slate-800/40 pb-1.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1 rounded-xl transition duration-155"
                                 >
                                     <div className="flex flex-col">
                                         <span className="text-[12.5px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
@@ -2691,7 +2664,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                 {/* Average historical row */}
                                 <div 
                                     onClick={() => handleTrendBreakdownClick('Compute')}
-                                    className="flex items-center justify-between last:border-b-0 pb-1 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1.5 rounded-xl transition duration-155"
+                                    className="flex items-center justify-between last:border-b-0 pb-1 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/20 px-2 py-1 rounded-xl transition duration-155"
                                 >
                                     <div className="flex flex-col">
                                         <span className="text-[12.5px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
@@ -2713,7 +2686,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                         </div>
 
                         {/* Summation Row */}
-                        <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-6 h-9">
+                        <div className="flex justify-between items-center pt-3 border-t border-slate-100 dark:border-slate-800/80 mt-4 h-9">
                             <span className="text-[10px] font-black tracking-wider text-[#8E8EA8] dark:text-slate-500 uppercase">
                                 {activeTrendTab === 'SPEND TREND' || activeTrendTab === 'WAREHOUSE SPEND' ? 'Total Period Spend:' :
                                  activeTrendTab === 'DATA TRANSFER' ? 'Total Transferred:' : 'Total Combined Size:'}
@@ -2731,22 +2704,55 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
 
             {/* TOP SPEND BY CATEGORY WIDGET (For Account Overview page) */}
             {activePageTab === 'Account overview' && (
-                <div id="top-spend-by-category-card" className="bg-white dark:bg-[#1F2937] p-5 sm:p-6 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col mb-5 select-none font-sans">
+                <div id="top-spend-by-category-card" className="bg-white dark:bg-[#1F2937] p-4 sm:p-4 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-col mb-5 select-none font-sans">
+                    {/* Header Row */}
+                    <div className="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 border-b border-slate-50 dark:border-slate-800 pb-2.5 mb-3.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <h2 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5">
+                                <span>Top Consumers</span>
+                                <InfoTooltip text="Resources, systems, and active users ranked by total credit consumption over the period." />
+                            </h2>
+                        </div>
+
+                        {/* Tabs for Top Consumers */}
+                        <div className="flex flex-wrap items-center gap-1 bg-slate-100/85 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-200/40 dark:border-slate-800/60 shadow-inner">
+                            {([
+                                { key: 'WAREHOUSE', label: 'warehouse' },
+                                { key: 'DATABASE', label: 'storage' },
+                                { key: 'TAGS', label: 'tag' },
+                                { key: 'QUERY PATTERN', label: 'query' },
+                                { key: 'USERS', label: 'user' }
+                            ] as const).map((tab) => (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => setActiveSpendTab(tab.key)}
+                                    className={`px-4 py-1.5 rounded-lg text-[9.5px] font-bold uppercase tracking-wider transition-all duration-150 cursor-pointer ${
+                                        activeSpendTab === tab.key
+                                            ? 'bg-white dark:bg-[#1F2937] text-[#5829D6] dark:text-[#A78BFA] shadow-xs'
+                                            : 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-100 hover:bg-white/40 dark:hover:bg-[#111827]/30'
+                                    }`}
+                                >
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
                     {/* Chart & Table columns split */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-2">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-start pt-1">
                         {/* Left Column: Horizontal Bar Chart of Top 5 */}
-                        <div id="horizontal-bar-graph-panel" className="lg:col-span-5 flex flex-col relative py-4 pr-2 pl-4">
+                        <div id="horizontal-bar-graph-panel" className="lg:col-span-5 flex flex-col relative py-1 pr-2 pl-4">
                             {/* Faint dotted coordinate guidelines in background */}
                             <div className="absolute inset-0 left-28 right-0 flex justify-between pointer-events-none select-none z-0">
-                                <div className="h-[200px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[200px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[200px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[200px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[200px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
                             </div>
 
                             {/* Outer container list of items */}
-                            <div className="space-y-6 relative z-10">
+                            <div className="space-y-3 relative z-10">
                                 {activeSpendData.items.map((item, index) => {
                                     // Calculate responsive width percentage
                                     const maxVal = Math.max(...activeSpendData.items.map(i => i.credits));
@@ -2776,7 +2782,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                             </div>
                                             
                                             {/* Bar capsule */}
-                                            <div className="flex-1 h-3.5 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center shadow-inner relative overflow-hidden">
+                                            <div className="flex-1 h-2 bg-slate-50 dark:bg-slate-900 rounded-full flex items-center shadow-inner relative overflow-hidden">
                                                 <div 
                                                     className={`h-full ${fillColors[index] || fillColors[fillColors.length - 1]} rounded-full transition-all duration-500 ease-out group-hover/bar:brightness-110`} 
                                                     style={{ width: barWidthPercentage }}
@@ -2788,7 +2794,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                             </div>
 
                             {/* X-Axis labels at the bottom */}
-                            <div className="flex justify-between items-center mt-4 pl-28 text-[9px] font-mono text-slate-400 dark:text-slate-500 select-none">
+                            <div className="flex justify-between items-center mt-2.5 pl-28 text-[9px] font-mono text-slate-400 dark:text-slate-500 select-none">
                                 {activeSpendTab === 'WAREHOUSE' && (
                                     <>
                                         <span>0</span>
@@ -2838,52 +2844,54 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                         </div>
 
                         {/* Right Column: Detailed allocation table */}
-                        <div id="allocation-details-table" className="lg:col-span-7 flex flex-col border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-800/60 lg:pl-8 pt-6 lg:pt-0">
-                            <span className="text-[10px] font-black tracking-widest text-[#8E8EA8] dark:text-slate-550 uppercase mb-4 block leading-none">
+                        <div id="allocation-details-table" className="lg:col-span-7 flex flex-col border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-800/60 lg:pl-6 pt-4 lg:pt-0">
+                            <span className="text-[10px] font-black tracking-widest text-[#8E8EA8] dark:text-slate-550 uppercase mb-2 block leading-none">
                                 Detailed Allocation (Top 5)
                             </span>
 
+                            {/* Sleek Sub headers for columns */}
+                            <div className="flex items-center justify-between px-3 pb-1 text-[9px] font-black tracking-widest text-slate-400 dark:text-slate-550 uppercase leading-none border-b border-slate-100/30 dark:border-slate-800/20 mb-1.5">
+                                <span className="flex-grow text-left">Consumer Name</span>
+                                <span className="w-16 text-right shrink-0">Share</span>
+                                <span className="w-24 text-right shrink-0">Consumption</span>
+                            </div>
+
                             {/* List layout of the 5 detailed rankings */}
-                            <div className="space-y-2.5 flex-grow">
+                            <div className="space-y-1 flex-grow">
                                 {activeSpendData.items.map((item) => (
                                     <div 
                                         key={item.name} 
                                         onClick={() => handleRowClick(item.name)}
-                                        className="group flex items-center justify-between p-3 sm:p-3.5 bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 hover:border-[#5829D6]/20 dark:hover:border-[#A78BFA]/20 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.01] hover:shadow-xs"
+                                        className="group flex items-center justify-between p-1.5 px-3 bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100/60 dark:hover:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 hover:border-[#5829D6]/20 dark:hover:border-[#A78BFA]/20 rounded-xl cursor-pointer transition-all duration-200 hover:scale-[1.01] hover:shadow-xs animate-in fade-in duration-200"
                                     >
-                                        <div className="flex flex-col">
+                                        <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                                            <div className="w-5.5 h-5.5 rounded bg-slate-100 dark:bg-slate-900/80 flex items-center justify-center text-[9px] font-black text-slate-500 dark:text-slate-400 shrink-0 select-none">
+                                                {item.rank.replace('RANK #', '')}
+                                            </div>
                                             <span 
-                                                className="text-[12px] font-black text-slate-850 dark:text-slate-100 uppercase tracking-tight group-hover:text-[#5829D6] dark:group-hover:text-[#A78BFA] transition-colors"
+                                                className="text-[12px] font-black text-slate-855 dark:text-slate-100 uppercase tracking-tight group-hover:text-[#5829D6] dark:group-hover:text-[#A78BFA] transition-colors truncate"
                                             >
                                                 {item.name}
                                             </span>
-                                            <span className="text-[9.5px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase mt-0.5">
-                                                {item.rank}
+                                        </div>
+
+                                        <div className="w-16 flex justify-end shrink-0">
+                                            <span className="inline-block text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/20 px-2 py-0.5 rounded-md min-w-[36px] text-center">
+                                                {item.percentage}%
                                             </span>
                                         </div>
 
-                                        <div className="flex items-center gap-5">
-                                            <div className="flex flex-col text-right">
-                                                <span className="text-[12px] font-black text-slate-850 dark:text-slate-55 flex items-baseline gap-0.5 justify-end">
-                                                    {item.credits.toLocaleString()} <span className="text-[10px] font-bold text-slate-450">cr</span>
-                                                </span>
-                                                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                                                    {item.percentage}%
-                                                </span>
-                                            </div>
-
-                                            <button
-                                                className="text-[9.5px] font-black text-[#5829D6] dark:text-[#A78BFA] group-hover:bg-[#5829D6] group-hover:text-white dark:group-hover:bg-[#A78BFA] dark:group-hover:text-slate-900 bg-white dark:bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-200/80 dark:border-slate-800 transition-all uppercase tracking-wider select-none shrink-0"
-                                            >
-                                                Details
-                                            </button>
+                                        <div className="w-24 text-right shrink-0">
+                                            <span className="text-[12px] font-black text-slate-855 dark:text-slate-55 flex items-baseline gap-0.5 justify-end">
+                                                {item.credits.toLocaleString()} <span className="text-[10px] font-bold text-slate-450">cr</span>
+                                            </span>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                             {/* Total Bottom Row Summary */}
-                            <div className="flex justify-between items-center pt-4 border-t border-slate-100 dark:border-slate-800/80 mt-4 h-9">
+                            <div className="flex justify-between items-center pt-2.5 border-t border-slate-100 dark:border-slate-800/80 mt-2.5 h-7">
                                 <span className="text-[10px] font-black tracking-wider text-slate-450 dark:text-slate-550 uppercase">
                                     Total category spend shown:
                                 </span>

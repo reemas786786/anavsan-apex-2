@@ -334,16 +334,54 @@ const QueryListView: React.FC<QueryListViewProps> = ({
     };
 
     const trendData = useMemo(() => {
-        const days = ['Feb 17', 'Feb 18', 'Feb 19', 'Feb 20', 'Feb 21', 'Feb 22', 'Feb 23'];
-        return days.map((day, dIdx) => {
-            const dayObj: any = { name: day };
-            chartData.forEach((item) => {
-                const hashNum = parseInt(item.id.replace('pat-', '')) || 1;
-                // Seed for unique, stable, and visually pleasing daily fluctuations
-                const seed = (dIdx * 4 + hashNum * 9) % 12;
-                const multiplier = 0.55 + (seed / 12) * 0.9; // ranging 0.55 to 1.45
-                const dailyAverage = item.costValue / 7;
-                dayObj[item.hash] = parseFloat((dailyAverage * multiplier).toFixed(2));
+        const daysConfig = [
+            { name: '4 Feb', fullDate: '4 Feb 2026', base: 4.6 },
+            { name: '', fullDate: '5 Feb 2026', base: 4.1 },
+            { name: '6 Feb', fullDate: '6 Feb 2026', base: 4.15 },
+            { name: '', fullDate: '7 Feb 2026', base: 4.75 },
+            { name: '8 Feb', fullDate: '8 Feb 2026', base: 5.2 },
+            { name: '', fullDate: '9 Feb 2026', base: 4.5 },
+            { name: '10 Feb', fullDate: '10 Feb 2026', base: 5.25 },
+            { name: '', fullDate: '11 Feb 2026', base: 4.7 },
+            { name: '12 Feb', fullDate: '12 Feb 2026', base: 5.15 },
+            { name: '', fullDate: '13 Feb 2026', base: 4.9 },
+            { name: '14 Feb', fullDate: '14 Feb 2026', base: 4.75 },
+            { name: '', fullDate: '15 Feb 2026', base: 5.35 },
+            { name: '16 Feb', fullDate: '16 Feb 2026', base: 4.35 },
+            { name: '', fullDate: '17 Feb 2026', base: 5.15 },
+            { name: '18 Feb', fullDate: '18 Feb 2026', base: 10.5 },
+            { name: '', fullDate: '19 Feb 2026', base: 5.85 },
+            { name: '20 Feb', fullDate: '20 Feb 2026', base: 7.15 },
+            { name: '', fullDate: '21 Feb 2026', base: 5.4 },
+            { name: '22 Feb', fullDate: '22 Feb 2026', base: 7.9 },
+            { name: '', fullDate: '23 Feb 2026', base: 9.6 },
+            { name: '24 Feb', fullDate: '24 Feb 2026', base: 6.6 },
+            { name: '', fullDate: '25 Feb 2026', base: 5.8 },
+            { name: '26 Feb', fullDate: '26 Feb 2026', base: 7.5 },
+            { name: '', fullDate: '27 Feb 2026', base: 8.0 },
+            { name: '28 Feb', fullDate: '28 Feb 2026', base: 8.45 },
+            { name: '1 Mar', fullDate: '1 Mar 2026', base: 5.55 },
+            { name: '', fullDate: '2 Mar 2026', base: 6.2 },
+            { name: '3 Mar', fullDate: '3 Mar 2026', base: 5.6 },
+            { name: '', fullDate: '4 Mar 2026', base: 5.75 }
+        ];
+
+        return daysConfig.map((day) => {
+            const dayObj: any = { name: day.name, fullDate: day.fullDate };
+            // Distribute the baseline amount among available patterns
+            const totalWeights = chartData.slice(0, 5).reduce((sum, item) => sum + item.costValue, 0) || 1;
+            
+            chartData.forEach((item, index) => {
+                const weight = item.costValue / totalWeights;
+                // Add minor organic variation per day for realistic signature
+                let noiseFactor = 1.0;
+                const seedName = day.fullDate || 'seed';
+                let charSum = 0;
+                for (let i = 0; i < seedName.length; i++) charSum += seedName.charCodeAt(i);
+                const customSeed = (charSum * (index + 7)) % 100;
+                noiseFactor = 0.85 + (customSeed / 100) * 0.3; // 0.85 to 1.15
+                
+                dayObj[item.hash] = parseFloat((day.base * weight * noiseFactor).toFixed(2));
             });
             return dayObj;
         });
@@ -352,16 +390,17 @@ const QueryListView: React.FC<QueryListViewProps> = ({
     const TrendTooltip = ({ active, payload, label }: any) => {
         if (active && payload && payload.length) {
             const sortedPayload = [...payload].sort((a, b) => b.value - a.value);
+            const displayDate = payload[0]?.payload?.fullDate || label;
             return (
                 <div className="bg-white p-3 rounded-xl shadow-lg border border-[#E2DDEB] text-[#161616] font-sans min-w-[220px]">
                     <p className="text-[11px] font-black text-text-secondary mb-2 border-b border-slate-100 pb-1.5 uppercase tracking-wider">
-                        Timeline: {label}
+                        Timeline: {displayDate}
                     </p>
                     <div className="space-y-1.5">
                         {sortedPayload.slice(0, 5).map((item: any, idx: number) => (
                             <div key={idx} className="flex items-center justify-between text-[11px] gap-4">
                                 <div className="flex items-center gap-1.5 overflow-hidden">
-                                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.stroke || item.color }} />
+                                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ backgroundColor: item.fill || item.stroke || item.color }} />
                                     <span className="font-mono text-[#4A4B57] font-semibold truncate">{item.name}:</span>
                                 </div>
                                 <span className="font-bold text-text-strong flex-shrink-0">${item.value.toFixed(2)}</span>
@@ -867,7 +906,7 @@ const QueryListView: React.FC<QueryListViewProps> = ({
                             
                             <div className="flex items-center gap-1.5 text-xs font-semibold text-text-secondary bg-slate-50 px-3 py-1.5 rounded-full border border-border-light">
                                 <span className="w-2.5 h-2.5 rounded-full bg-gradient-to-r from-[#5829D6] via-[#10B981] to-[#EF4444] block animate-pulse" />
-                                <span>Unit: USD ($) - {chartTab === 'trend' ? '7-Day Trend' : 'Ranked Top 10'}</span>
+                                <span>Unit: USD ($) - {chartTab === 'trend' ? 'Daily Pattern Trend (4 Feb - 3 Mar)' : 'Ranked Top 10'}</span>
                             </div>
                         </div>
 
@@ -875,9 +914,9 @@ const QueryListView: React.FC<QueryListViewProps> = ({
                         <div className="h-[220px] w-full pt-2">
                             <ResponsiveContainer width="100%" height="100%">
                                 {chartTab === 'trend' ? (
-                                    <LineChart
+                                    <BarChart
                                         data={trendData}
-                                        margin={{ top: 15, right: 35, left: -20, bottom: 5 }}
+                                        margin={{ top: 15, right: 10, left: -20, bottom: 5 }}
                                     >
                                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2DDEB" opacity={0.4} />
                                         <XAxis 
@@ -905,18 +944,16 @@ const QueryListView: React.FC<QueryListViewProps> = ({
                                             wrapperStyle={{ fontSize: 10, fontWeight: 700, fontFamily: 'monospace', paddingTop: 8 }}
                                         />
                                         {chartData.slice(0, 5).map((entry, index) => (
-                                            <Line
+                                            <Bar
                                                 key={entry.hash}
-                                                type="monotone"
                                                 dataKey={entry.hash}
                                                 name={entry.hash}
-                                                stroke={QUERY_PATTERN_COLORS[index % QUERY_PATTERN_COLORS.length]}
-                                                strokeWidth={2.5}
-                                                dot={{ r: 3, strokeWidth: 1.5 }}
-                                                activeDot={{ r: 5 }}
+                                                stackId="a"
+                                                fill={QUERY_PATTERN_COLORS[index % QUERY_PATTERN_COLORS.length]}
+                                                className="hover:opacity-90 transition-opacity"
                                             />
                                         ))}
-                                    </LineChart>
+                                    </BarChart>
                                 ) : (
                                     <BarChart
                                         data={chartData}
