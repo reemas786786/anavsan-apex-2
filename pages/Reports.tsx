@@ -20,7 +20,7 @@ const Reports: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between border-b border-border-light pb-4">
         <div>
           <h1 className="text-[28px] font-bold text-text-strong tracking-tight flex items-center gap-2">
-            Reports <span className="text-xs font-semibold px-2.5 py-1 bg-purple-50 dark:bg-purple-950/30 text-[#6A38EB] dark:text-purple-300 rounded-full border border-purple-100 dark:border-purple-900 shadow-sm">The Scorecard</span>
+            Reports
           </h1>
           <p className="text-sm text-text-secondary mt-1">
             Historical Audit confirming system efficacy, active compliance scores, and financial wins reported directly to executives.
@@ -34,19 +34,8 @@ const Reports: React.FC = () => {
         </div>
       </div>
 
-      {/* Top Welcome Concept */}
-      <div className="bg-gradient-to-r from-[#6A38EB]/5 to-slate-50 dark:from-[#6A38EB]/10 dark:to-slate-900 border border-purple-100/60 dark:border-slate-800 rounded-2xl p-5 flex gap-4 text-xs text-slate-600 dark:text-slate-300 items-start">
-        <Award className="h-6 w-6 text-[#6A38EB] shrink-0 mt-0.5" />
-        <div>
-          <p className="font-extrabold text-slate-900 dark:text-white">Confirmatory Evidence Board</p>
-          <p className="font-medium text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-            While the other modules emphasize actionable optimization, the Scorecard compiles historical handovers to demonstrate active ROI. Use these metrics to confirm team efficiencies across accounts.
-          </p>
-        </div>
-      </div>
-
       {/* Executive Quick KPIs Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {/* KPI 1: ROI */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-5 rounded-2xl shadow-sm text-left relative overflow-hidden group">
@@ -62,29 +51,10 @@ const Reports: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-slate-100 dark:border-slate-800 pt-3.5 mt-4 flex justify-between items-center text-xs">
-            <span className="text-slate-500 font-semibold">MoM Growth Ratio:</span>
+            <span className="text-slate-505 font-semibold">MoM Growth Ratio:</span>
             <span className="text-emerald-600 dark:text-emerald-400 font-extrabold flex items-center gap-0.5">
               +14.2% <ArrowUpRight className="w-3 h-3" />
             </span>
-          </div>
-        </div>
-
-        {/* KPI 2: Compliance Score */}
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800/80 p-5 rounded-2xl shadow-sm text-left relative overflow-hidden group">
-          <div className="absolute right-0 top-0 w-24 h-24 bg-blue-500/5 blur-2xl rounded-full pointer-events-none" />
-          <div className="flex justify-between items-start">
-            <div>
-              <span className="text-[14px] font-black text-slate-400 dark:text-slate-500 block">Compliance integrity</span>
-              <span className="text-3xl font-black text-blue-600 dark:text-blue-400 mt-2 block font-sans">100%</span>
-              <span className="text-[10px] text-slate-405 font-semibold mt-1 block">Zero PII / credentials exposed across catalogs</span>
-            </div>
-            <div className="p-2.5 bg-blue-50 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400 rounded-xl border border-blue-100/30">
-              <Lock className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="border-t border-slate-100 dark:border-slate-800 pt-3.5 mt-4 flex justify-between items-center text-xs">
-            <span className="text-slate-500 font-semibold">Active audits completed:</span>
-            <span className="text-blue-600 dark:text-blue-400 font-extrabold">2,410 / wk</span>
           </div>
         </div>
 
@@ -93,7 +63,7 @@ const Reports: React.FC = () => {
           <div className="absolute right-0 top-0 w-24 h-24 bg-[#6A38EB]/5 blur-2xl rounded-full pointer-events-none" />
           <div className="flex justify-between items-start">
             <div>
-              <span className="text-[14px] font-black text-slate-400 dark:text-slate-500 block">Agent autopilot ratio</span>
+              <span className="text-[14px] font-black text-slate-400 dark:text-slate-505 block">Agent autopilot ratio</span>
               <span className="text-3xl font-black text-[#6A38EB] dark:text-purple-300 mt-2 block font-sans">74.5%</span>
               <span className="text-[10px] text-slate-405 font-semibold mt-1 block">Resolutions handled fully Autonomously</span>
             </div>
@@ -102,7 +72,7 @@ const Reports: React.FC = () => {
             </div>
           </div>
           <div className="border-t border-slate-100 dark:border-slate-800 pt-3.5 mt-4 flex justify-between items-center text-xs">
-            <span className="text-slate-500 font-semibold">Autonomous vs. Guided:</span>
+            <span className="text-slate-505 font-semibold">Autonomous vs. Guided:</span>
             <span className="font-extrabold text-[#6A38EB] dark:text-purple-300">956 Aut / 328 Gid</span>
           </div>
         </div>

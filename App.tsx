@@ -24,6 +24,7 @@ import CheckEmailPage from './pages/CheckEmailPage';
 import CreateNewPasswordPage from './pages/CreateNewPasswordPage';
 import PasswordResetSuccessPage from './pages/PasswordResetSuccessPage';
 import { Page, Account, SQLFile, UserRole, User, UserStatus, DashboardItem, BigScreenWidget, QueryListItem, AssignedQuery, AssignmentPriority, AssignmentStatus, PullRequest, Notification, ActivityLog, BreadcrumbItem, Warehouse, SQLVersion, QueryListFilters, CollaborationEntry, Subscription, SubscriptionPlan, BillingCycle, Recommendation } from './types';
+import { safeStorage } from './utils/safeStorage';
 import { sqlFilesData as initialSqlFiles, usersData, dashboardsData as initialDashboardsData, assignedQueriesData as initialAssignedQueries, pullRequestsData, notificationsData as initialNotificationsData, activityLogsData, warehousesData, queryListData, connectionsData, accountApplicationsData, demoUsers, recommendationsData as initialRecommendationsData } from './data/dummyData';
 import { accountNavItems, IconInfo, IconUser, IconLightbulb, IconChevronRight } from './constants';
 import SettingsPage from './pages/SettingsPage';
@@ -116,7 +117,9 @@ const App: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [authView, setAuthView] = useState<'landing' | 'login' | 'signup' | 'request-submitted' | 'forgot-password' | 'check-email' | 'create-password' | 'reset-success'>('login');
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('anavsan_auth') === 'true';
+    const saved = safeStorage.getItem('anavsan_auth');
+    if (saved === 'false') return false;
+    return true; // Bypass login by default for immediate preview access
   }); 
   
   const [activePage, setActivePage] = useState<Page>('Ask Apex');
@@ -171,10 +174,10 @@ const App: React.FC = () => {
   
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
-      const savedUser = localStorage.getItem('anavsan_user');
-      return savedUser ? JSON.parse(savedUser) : null;
+      const savedUser = safeStorage.getItem('anavsan_user');
+      return savedUser ? JSON.parse(savedUser) : demoUsers['finops@mail.com']; // Fallback to avoid null errors when bypassed
     } catch {
-      return null;
+      return demoUsers['finops@mail.com'];
     }
   }); 
   const [theme, setTheme] = useState<Theme>('light');
@@ -505,8 +508,8 @@ const App: React.FC = () => {
   
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('anavsan_auth');
-    localStorage.removeItem('anavsan_user');
+    safeStorage.removeItem('anavsan_auth');
+    safeStorage.removeItem('anavsan_user');
     setAuthView('login');
   };
 
@@ -516,8 +519,8 @@ const App: React.FC = () => {
       setTimeout(() => {
           setCurrentUser(user);
           setIsAuthenticated(true);
-          localStorage.setItem('anavsan_auth', 'true');
-          localStorage.setItem('anavsan_user', JSON.stringify(user));
+          safeStorage.setItem('anavsan_auth', 'true');
+          safeStorage.setItem('anavsan_user', JSON.stringify(user));
           handleSetActivePage('Ask Apex');
           setLoading(false);
       }, 1000);
@@ -913,7 +916,7 @@ const App: React.FC = () => {
                         <Breadcrumb items={breadcrumbItems} />
                     </div>
                 )}
-                <div className={`flex-1 bg-background ${activePage === 'Ask Apex' || activePage === 'AI agent' ? 'overflow-hidden flex flex-col h-full' : 'overflow-auto'}`}>
+                <div className={`flex-1 bg-background ${activePage === 'Ask Apex' || activePage === 'AI agent' || activePage === 'Active policies' || activePage === 'Trigger' ? 'overflow-hidden flex flex-col h-full' : 'overflow-auto'}`}>
                     {renderPage()}
                 </div>
             </main>

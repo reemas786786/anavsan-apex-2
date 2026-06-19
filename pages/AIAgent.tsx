@@ -12,6 +12,8 @@ import AgenticResponse from '../components/AgenticResponse';
 import DiagnosticWizardFlow from '../components/DiagnosticWizardFlow';
 import { IconShare, IconDotsVertical, IconChevronDown, IconArrowUp, IconEdit, IconClipboardCopy, IconCheck, IconAIAgent, IconSearch, IconFlag, IconMessageSquare, IconSparkles, IconExternalLink, IconPin } from '../constants';
 import { recommendationsData } from '../data/dummyData';
+import { safeStorage } from '../utils/safeStorage';
+const localStorage = safeStorage;
 
 export interface AIAgentProps {
     onNavigate?: (page: string) => void;
@@ -955,11 +957,11 @@ const AIAgent: React.FC<AIAgentProps> = ({ onNavigate, account }) => {
 
     // Handle deep-linked actions from AI Directives or Enforcement Desk
     useEffect(() => {
-        const pendingPrompt = localStorage.getItem('apex_initial_chat_prompt');
+        const pendingPrompt = safeStorage.getItem('apex_initial_chat_prompt');
         if (pendingPrompt && activeChatId) {
             const hasChat = chats.some(c => c.id === activeChatId);
             if (hasChat) {
-                localStorage.removeItem('apex_initial_chat_prompt');
+                safeStorage.removeItem('apex_initial_chat_prompt');
                 handleSendMessage(undefined, pendingPrompt);
             }
         }

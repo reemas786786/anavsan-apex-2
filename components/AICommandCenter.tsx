@@ -94,7 +94,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({ onNavigate }) => {
             id: '1',
             type: 'Cost Governance (Snowflake Credits)',
             title: 'Warehouse Credit Limit',
-            text: 'Anavsan detected a 300% credit spike in MARKETING_WH. I’ve drafted a hard-stop limit of 50 credits/day to prevent budget overrun.',
+            text: 'A 300% credit spike occurred in MARKETING_WH, risking substantial budget overruns before the next billing cycle. Enforcing a hard-stop limit of 50 credits/day is recommended to protect the remaining allocation.',
             actionLabel: 'Enforce Limit',
             badge: 'HIGH IMPACT',
             badgeClass: 'bg-[#FFFEEB] dark:bg-amber-500/10 text-[#D97706] border-[#FEF3C7] dark:border-amber-500/20'
@@ -103,7 +103,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({ onNavigate }) => {
             id: '2',
             type: 'Resource Optimization (APEX Engine)',
             title: 'Warehouse Right-Sizing',
-            text: "The SALES_ANALYTICS warehouse is currently 'Large' but utilization is under 15%. Suggesting a downsize to 'Small' to save $1,200/mo.",
+            text: "The SALES_ANALYTICS warehouse is configured at a 'Large' size but utilization is under 15%, resulting in $1,200/month of wasted compute spend. Downsizing the warehouse to 'Small' will fully optimize resource allocation.",
             actionLabel: 'Apply Optimization',
             badge: 'OPTIMIZATION',
             badgeClass: 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-500/20'
@@ -112,7 +112,7 @@ const AICommandCenter: React.FC<AICommandCenterProps> = ({ onNavigate }) => {
             id: '3',
             type: 'Security & Compliance (Data Bodyguard)',
             title: 'PII Leak Detected',
-            text: 'Found unmasked Email and SSN patterns in the LOGISTICS_DATA table. Suggesting an immediate Dynamic Data Masking policy.',
+            text: 'Unmasked Email and SSN patterns have been exposed in the LOGISTICS_DATA table, violating active security compliance standards. Implementing an immediate Dynamic Data Masking policy is required to secure sensitive customer data.',
             actionLabel: 'Enforce Masking',
             badge: 'CRITICAL',
             badgeClass: 'bg-red-50 dark:bg-red-500/10 text-red-650 dark:text-red-400 border-red-100 dark:border-red-500/20'

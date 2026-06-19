@@ -23,7 +23,7 @@ interface OptimizationHealthItem {
 interface OptimizationHealthWidgetProps {
     onNavigate: (page: Page, subPage?: string, state?: any) => void;
     accounts: Account[];
-    onSelectAccount: (account: Account) => void;
+    onSelectAccount: (account: Account, initialPage?: string, sourceTab?: string) => void;
     displayMode?: 'cost' | 'credits';
 }
 
@@ -135,11 +135,11 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
             (acc) => acc.name.toLowerCase() === accountName.toLowerCase()
         );
         if (matchedAccount) {
-            onSelectAccount(matchedAccount);
+            onSelectAccount(matchedAccount, 'Ask Apex');
         } else {
             // Fallback: if we can't find by exact name match (e.g. Analytics Core which might not be connected directly), navigate to first account
             if (accounts.length > 0) {
-                onSelectAccount(accounts[0]);
+                onSelectAccount(accounts[0], 'Ask Apex');
             }
         }
     };
@@ -232,28 +232,28 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
             {/* Combined Metrics Card */}
             <div id="combined-metrics-widget" className="bg-white dark:bg-slate-900 rounded-[24px] border border-border-light shadow-sm overflow-hidden">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 lg:divide-x divide-border-light dark:divide-white/5">
-                    {/* Widget 1: Total org spend */}
+                    {/* Widget 1: Total Org Spend */}
                     <div id="metric-total-spend" className="p-6 flex flex-col justify-between min-h-[140px] hover:bg-slate-50/25 dark:hover:bg-slate-800/10 transition-colors">
                         <div>
                             <div className="flex items-center gap-1">
-                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Total spend of the Snowflake org</span>
+                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Total Org Spend</span>
                                 <InfoTooltip text="Year-to-date cumulative organization spend" position="bottom" />
                             </div>
                             <span className="text-[20px] font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.totalSpend}</span>
                         </div>
-                        <span className="text-[9.5px] text-text-muted block leading-snug">YTD cumulative organization spend</span>
+                        <span className="text-[9.5px] text-text-muted block leading-snug">YTD cumulative consumption</span>
                     </div>
 
-                    {/* Widget 2: Average monthly spend */}
+                    {/* Widget 2: Avg. Monthly Spend */}
                     <div id="metric-avg-spend" className="p-6 flex flex-col justify-between min-h-[140px] hover:bg-slate-50/25 dark:hover:bg-slate-800/10 transition-colors">
                         <div>
                             <div className="flex items-center gap-1">
-                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Average monthly spend</span>
+                                <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase">Avg. Monthly Spend</span>
                                 <InfoTooltip text="Rolling average monthly standard cost pool" position="bottom" />
                             </div>
                             <span className="text-[20px] font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.averageMonthlySpend}</span>
                         </div>
-                        <span className="text-[9.5px] text-text-muted block leading-snug">Rolling average standard cost pool</span>
+                        <span className="text-[9.5px] text-text-muted block leading-snug">Rolling 3-month average</span>
                     </div>
 
                     {/* Widget 3: Accounts */}
@@ -265,19 +265,19 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                             </div>
                             <span className="text-[20px] font-bold text-[#111827] dark:text-slate-100 mt-2.5 block font-sans tracking-tight">{stats.accountsCount}</span>
                         </div>
-                        <span className="text-[9.5px] text-text-muted block leading-snug">Active virtual organization accounts</span>
+                        <span className="text-[9.5px] text-text-muted block leading-snug">Monitored Snowflake accounts</span>
                     </div>
 
-                    {/* Widget 4: Total est. savings & recs */}
+                    {/* Widget 4: EST Savings */}
                     <div 
                         id="metric-est-savings"
                         onClick={() => onNavigate('Enforcement Desk')}
                         className="p-6 flex justify-between items-center cursor-pointer hover:bg-[#5829D6]/5 dark:hover:bg-[#818CF8]/5 transition-all group relative overflow-hidden min-h-[140px]"
                     >
-                        <div className="flex flex-col h-full justify-between z-10 pr-2">
+                        <div className="flex flex-col h-full justify-between z-10 pr-2 w-full">
                             <div>
                                 <span className="text-[10px] font-bold text-[#8E8EA8] dark:text-[#9A9AB2] tracking-wider uppercase group-hover:text-[#5829D6] dark:group-hover:text-[#818CF8] transition-colors inline-flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
-                                    <span>Total est. savings & recs</span>
+                                    <span>EST Savings</span>
                                     <InfoTooltip text="Potential annual savings and total active recommendation triggers" position="bottom" />
                                 </span>
                                 <div className="flex items-baseline gap-2 mt-1.5">
@@ -286,7 +286,8 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                                 </div>
                             </div>
                             
-                            <div className="mt-1">
+                            <div className="mt-1 flex justify-between items-end">
+
                                 <span className="inline-flex items-center gap-1 px-3 py-1 bg-[#5829D6] text-white dark:bg-[#818CF8] dark:text-slate-950 font-extrabold text-[10px] rounded-full hover:bg-[#4d22bd] dark:hover:bg-[#727cf5] transition-all duration-200 select-none shadow-[0_2px_4px_rgba(88,41,214,0.15)] dark:shadow-[0_2px_4px_rgba(129,140,248,0.15)]">
                                     View Enforcement Desk
                                     <ArrowRight className="w-3 h-3 ml-1 group-hover:translate-x-0.5 transition-transform" />
@@ -306,7 +307,7 @@ const OptimizationHealthWidget: React.FC<OptimizationHealthWidgetProps> = ({ onN
                 <div className="p-5 pb-3 bg-white border-b border-border-light flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div className="flex flex-col">
                         <h3 className="text-sm font-bold text-text-strong flex items-center gap-1.5 leading-none">
-                            <span>Optimization summary</span>
+                            <span>Optimization Summary</span>
                             <InfoTooltip text="A consolidated view of optimization metrics, credit usage, and saving potentials across virtual organization accounts." position="bottom" />
                         </h3>
                     </div>

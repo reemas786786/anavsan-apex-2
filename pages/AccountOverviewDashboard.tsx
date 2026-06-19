@@ -1,5 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Account, Warehouse, QueryListItem } from '../types';
+import { safeStorage } from '../utils/safeStorage';
+const localStorage = safeStorage;
 import { queryListData } from '../data/dummyData';
 import { ResponsiveContainer, Tooltip, BarChart, Bar, XAxis, YAxis, AreaChart, Area, LineChart, Line, CartesianGrid, Cell, Legend } from 'recharts';
 import { Sparkles, Info, Calendar, ChevronDown, RefreshCw, Layers, Slack, Github, MessageSquare, Network, Clock, Shield, Tag, Search, X, Check, Server, Database, Boxes, Table, Cloud, Cpu, Edit3, ArrowUpDown, Maximize2, AlertTriangle, TrendingUp } from 'lucide-react';
@@ -2437,7 +2439,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                 }`}
                             >
                                 {tab === 'SPEND TREND' ? 'total spend' : 
-                                 tab === 'WAREHOUSE SPEND' ? 'compute spend' : 
+                                 tab === 'WAREHOUSE SPEND' ? 'compute' : 
                                  tab === 'STORAGE GROWTH' ? 'storage' : 
                                  tab.toLowerCase()}
                             </button>
@@ -2611,7 +2613,7 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                                     <div className="flex items-center justify-between">
                                         <div className="flex flex-col">
                                             <span className="text-[12.5px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">
-                                                {activeTrendTab === 'SPEND TREND' ? 'CLOUD SERVICES' :
+                                                {activeTrendTab === 'SPEND TREND' ? 'DATA TRANSFER' :
                                                  activeTrendTab === 'WAREHOUSE SPEND' ? 'Security Services Credit' :
                                                  activeTrendTab === 'DATA TRANSFER' ? 'Bandwidth Control plane' : 'Fail-Safe Protection'}
                                             </span>
@@ -2739,16 +2741,16 @@ const AccountOverviewDashboard: React.FC<AccountOverviewDashboardProps> = ({ acc
                     </div>
 
                     {/* Chart & Table columns split */}
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-start pt-1">
+                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 lg:gap-8 items-stretch pt-1">
                         {/* Left Column: Horizontal Bar Chart of Top 5 */}
-                        <div id="horizontal-bar-graph-panel" className="lg:col-span-5 flex flex-col relative py-1 pr-2 pl-4">
+                        <div id="horizontal-bar-graph-panel" className="lg:col-span-5 flex flex-col justify-between h-full relative py-1 pr-2 pl-4">
                             {/* Faint dotted coordinate guidelines in background */}
-                            <div className="absolute inset-0 left-28 right-0 flex justify-between pointer-events-none select-none z-0">
-                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
-                                <div className="h-[110px] border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                            <div className="absolute inset-0 bottom-6 left-28 right-0 flex justify-between pointer-events-none select-none z-0">
+                                <div className="h-full border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-full border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-full border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-full border-r border-dashed border-slate-100 dark:border-slate-850/50" />
+                                <div className="h-full border-r border-dashed border-slate-100 dark:border-slate-850/50" />
                             </div>
 
                             {/* Outer container list of items */}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   ShieldCheck, 
@@ -18,7 +18,15 @@ import {
   Clock,
   ArrowLeft,
   Sparkles,
-  Calendar
+  Calendar,
+  X,
+  Play,
+  Check,
+  Loader2,
+  Globe,
+  Tag,
+  Shield,
+  ChevronDown
 } from 'lucide-react';
 
 interface Policy {
@@ -38,26 +46,26 @@ interface Policy {
 const mockPoliciesList: Policy[] = [
   {
     id: 'p1',
-    name: 'Eliminate Vampire Burn (Idle Warehouse)',
+    name: 'Idle Warehouse Suppression',
     targetScope: 'Dev Warehouses',
     governanceMode: 'Autonomous',
     lastExecution: '2 mins ago',
     status: 'Active',
     totalTriggersCount: 142,
     creditsSaved: 485,
-    metricLabel: 'Idle Suspend Rate',
+    metricLabel: 'Success Rate',
     metricValue: '98.4%'
   },
   {
     id: 'p2',
-    name: 'Prevent Million Dollar Query',
+    name: 'High-Cost Query Prevention',
     targetScope: 'Analyst Role',
     governanceMode: 'Autonomous',
     lastExecution: '15 mins ago',
     status: 'Active',
     totalTriggersCount: 8,
     creditsSaved: 1200,
-    metricLabel: 'Max Cost Limit',
+    metricLabel: 'Credit Limit',
     metricValue: '180 credits'
   },
   {
@@ -93,7 +101,7 @@ const mockPoliciesList: Policy[] = [
     status: 'Active',
     totalTriggersCount: 19,
     creditsSaved: 230,
-    metricLabel: 'Spend Control cap',
+    metricLabel: 'Spend Control Cap',
     metricValue: '$1,200/mo'
   }
 ];
@@ -112,62 +120,62 @@ const mockTriggerLogs: Record<string, TriggerLog[]> = {
     {
       id: 'log-11',
       timestamp: 'June 08, 10:51 AM',
-      action: 'Auto Suspended DEV_ANALYTICS_WH',
+      action: 'Auto-suspended DEV_ANALYTICS_WH',
       status: 'Success',
       saving: '1.2 Credits/hr saved',
-      details: 'Detected 10 minutes of complete inactivity. Automatically suspended compute node to stop idle burn.'
+      details: 'System detected 10 minutes of inactivity. Compute node suspended to prevent idle credit consumption.'
     },
     {
       id: 'log-12',
       timestamp: 'June 08, 09:14 AM',
-      action: 'Auto Suspended COMPUTE_WH_DEV',
+      action: 'Auto-suspended COMPUTE_WH_DEV',
       status: 'Success',
       saving: '2.4 Credits/hr saved',
-      details: 'Inactivity trigger threshold met (60s). Secondary developer warehouse has been auto-terminated.'
+      details: 'Inactivity threshold reached. Secondary developer warehouse was auto-terminated.'
     },
     {
       id: 'log-13',
       timestamp: 'June 07, 04:30 PM',
-      action: 'Auto Suspended SANDBOX_ENGINE_WH',
+      action: 'Auto-suspended SANDBOX_ENGINE_WH',
       status: 'Success',
       saving: '4.0 Credits/hr saved',
-      details: 'No active connections/queries detected on Sandbox platform for over 15 minutes.'
+      details: 'Inactivity threshold reached. Idle sandbox database engine was auto-suspended.'
     }
   ],
   p2: [
     {
       id: 'log-21',
       timestamp: 'June 08, 10:38 AM',
-      action: 'Throttled Bad Join Query from Analyst',
+      action: 'Blocked High-Cost Join Query',
       status: 'Blocked',
       saving: '120.5 Credits prevented',
-      details: 'Query ID: sf-92a0d1b breached threshold cost rules. Terminated cross-join query automatically.'
+      details: 'Query ID: sf-92a0d1b breached threshold cost rules. Cross-join detected. Terminated query automatically to prevent overrun.'
     },
     {
       id: 'log-22',
       timestamp: 'June 05, 02:22 PM',
-      action: 'Killed Infinite Loop Query on BI_WH',
+      action: 'Terminated Infinite Loop Query',
       status: 'Blocked',
       saving: '45.0 Credits prevented',
-      details: 'Query ID: sf-098c114 exceeded time-bound credit budget. Aborted to avoid severe cost overrun.'
+      details: 'Query ID: sf-098c114 exceeded time-bound credit budget. Infinite execution loop detected. Aborted automatically.'
     }
   ],
   p3: [
     {
       id: 'log-31',
       timestamp: 'June 08, 09:50 AM',
-      action: 'Downsize Proposal: DAILY_LOAD_WH',
+      action: 'Warehouse Downsize Recommended',
       status: 'Pending Review',
       saving: '16.0 Credits/day potential',
-      details: 'CPU utilization averages under 4.2% for the past 7 daily load cycles. Recommending downsize Large → Medium.'
+      details: 'DAILY_LOAD_WH CPU utilization averaged under 4.2% for 7 consecutive load cycles. Rightsizing recommended.'
     },
     {
       id: 'log-32',
       timestamp: 'June 06, 11:00 AM',
-      action: 'Downsize Approved: REPORTING_BIG_WH',
+      action: 'Warehouse Downsize Enforced',
       status: 'Action Taken',
       saving: '8.0 Credits/hr saved',
-      details: 'Admin user approved downsize request. Reconfigured reporting cluster size successfully.'
+      details: 'REPORTING_BIG_WH resized from Large to Medium based on guided optimization policy. Cluster reconfigured successfully.'
     }
   ],
   p4: [
@@ -326,7 +334,7 @@ const PolicyCard: React.FC<{
       {/* Bottom Block with Actions */}
       <div className="px-4 py-2.5 bg-slate-50/45 dark:bg-slate-950/20 border-t border-slate-100 dark:border-slate-800/70 flex items-center justify-between relative z-10">
         <span className="text-[14px] font-extrabold text-slate-450 leading-none">
-          Enforcement desk
+          Review Enforcement
         </span>
         <div className="flex items-center gap-1.5">
           <button 
@@ -356,12 +364,34 @@ const PolicyCard: React.FC<{
 };const ActivePolicies: React.FC = () => {
   const [policies, setPolicies] = useState<Policy[]>(mockPoliciesList);
   const [selectedPolicyId, setSelectedPolicyId] = useState<string>('p1');
-  const [isLogDrawerOpen, setIsLogDrawerOpen] = useState(false);
+  const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isSidePanelOpen, setIsSidePanelOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  const [scopeFilter, setScopeFilter] = useState('All');
+  const [modeFilter, setModeFilter] = useState('All');
+  const [statusFilter, setStatusFilter] = useState('All');
+
+  const [isScopeOpen, setIsScopeOpen] = useState(false);
+  const [isModeOpen, setIsModeOpen] = useState(false);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+
   const [wizardStep, setWizardStep] = useState<'gallery' | 'config'>('gallery');
   const [selectedBlueprint, setSelectedBlueprint] = useState<string | null>(null);
   const [governanceMode, setGovernanceMode] = useState<'Autonomous' | 'Guided'>('Autonomous');
+  const [allTriggerLogs, setAllTriggerLogs] = useState<Record<string, TriggerLog[]>>(mockTriggerLogs);
+  const [isManualTriggering, setIsManualTriggering] = useState(false);
+  const [triggerSuccess, setTriggerSuccess] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const blueprints = [
     {
@@ -398,10 +428,14 @@ const PolicyCard: React.FC<{
     }
   ];
 
-  const filteredPolicies = policies.filter(policy => 
-    policy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    policy.targetScope.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPolicies = policies.filter(policy => {
+    const matchesSearch = policy.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                          policy.targetScope.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesScope = scopeFilter === 'All' || policy.targetScope.toLowerCase().includes(scopeFilter.toLowerCase().replace(' warehouses', ''));
+    const matchesMode = modeFilter === 'All' || policy.governanceMode === modeFilter;
+    const matchesStatus = statusFilter === 'All' || policy.status === statusFilter;
+    return matchesSearch && matchesScope && matchesMode && matchesStatus;
+  });
 
   const handleOpenSidePanel = () => {
     setWizardStep('gallery');
@@ -448,6 +482,110 @@ const PolicyCard: React.FC<{
     setIsSidePanelOpen(false);
   };
 
+  const handleManualTrigger = () => {
+    if (isManualTriggering) return;
+    setIsManualTriggering(true);
+    setTriggerSuccess(false);
+
+    setTimeout(() => {
+      setIsManualTriggering(false);
+      setTriggerSuccess(true);
+
+      // Create a simulated log
+      const selectedPolicy = policies.find(p => p.id === selectedPolicyId);
+      if (selectedPolicy) {
+        const now = new Date();
+        const timestampStr = now.toLocaleDateString('en-US', { month: 'short', day: '2-digit' }) + ', ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+        
+        let actionStr = 'Manual Suspend Executed';
+        let detailStr = 'Successfully triggered warehouse evaluation. Compute nodes analyzed and verified as optimized.';
+        let savingStr = '1.8 Credits saved';
+        let savingNum = 2;
+
+        if (selectedPolicy.id === 'p1') {
+          actionStr = 'Manual Suspend: DEV_ANALYTICS_WH';
+          detailStr = 'Warehouse was idle with 0 connections. Suspended manually via Details console.';
+          savingStr = '1.2 Credits/hr saved';
+          savingNum = 1;
+        } else if (selectedPolicy.id === 'p2') {
+          actionStr = 'Manual Query Kill: Infinite loop query in BI_WH';
+          detailStr = 'Query ID: sf-918ff breached execution boundaries. Manually aborted query to avoid billing overrun.';
+          savingStr = '45.0 Credits saved';
+          savingNum = 45;
+        } else if (selectedPolicy.id === 'p3') {
+          actionStr = 'Manual Rightsizing Profile Applied: ETL_COMPUTE';
+          detailStr = 'Submitted warehouse downsize configurations to active workloads successfully.';
+          savingStr = '8.0 Credits saved';
+          savingNum = 8;
+        } else if (selectedPolicy.id === 'p4') {
+          actionStr = 'Manual Lifecycle Janitor Run';
+          detailStr = 'Scanned and archived 3 stale temporary sandboxes tables from Staging Scope.';
+          savingStr = '0.5 TB Reclaimed';
+          savingNum = 1;
+        } else {
+          actionStr = `Manual Execution: ${selectedPolicy.name}`;
+          detailStr = 'Successfully invoked manual trigger dry run. Integrity constraints validated.';
+          savingStr = '1.5 Credits saved';
+          savingNum = 2;
+        }
+
+        const newLog: TriggerLog = {
+          id: `manual-log-${Date.now()}`,
+          timestamp: timestampStr,
+          action: actionStr,
+          status: 'Success',
+          saving: savingStr,
+          details: detailStr
+        };
+
+        setAllTriggerLogs(prev => ({
+          ...prev,
+          [selectedPolicy.id]: [newLog, ...(prev[selectedPolicy.id] || [])]
+        }));
+
+        setPolicies(prevPolicies => prevPolicies.map(p => {
+          if (p.id === selectedPolicy.id) {
+            return {
+              ...p,
+              totalTriggersCount: p.totalTriggersCount + 1,
+              creditsSaved: p.creditsSaved + savingNum,
+              lastExecution: 'Just now'
+            };
+          }
+          return p;
+        }));
+      }
+
+      setTimeout(() => {
+        setTriggerSuccess(false);
+      }, 2000);
+    }, 1500);
+  };
+
+  const handleTogglePolicyStatus = (id: string) => {
+    setPolicies(prev => prev.map(p => {
+      if (p.id === id) {
+        return {
+          ...p,
+          status: p.status === 'Active' ? 'Paused' : 'Active'
+        };
+      }
+      return p;
+    }));
+  };
+
+  const handleUpdatePolicyGovernance = (id: string, mode: 'Autonomous' | 'Guided') => {
+    setPolicies(prev => prev.map(p => {
+      if (p.id === id) {
+        return {
+          ...p,
+          governanceMode: mode
+        };
+      }
+      return p;
+    }));
+  };
+
   const renderLogContent = () => {
     const selectedPolicy = policies.find(p => p.id === selectedPolicyId);
     if (!selectedPolicy) {
@@ -459,7 +597,7 @@ const PolicyCard: React.FC<{
       );
     }
 
-    const logs = mockTriggerLogs[selectedPolicy.id] || [];
+    const logs = allTriggerLogs[selectedPolicy.id] || [];
 
     return (
       <div className="space-y-4">
@@ -554,165 +692,343 @@ const PolicyCard: React.FC<{
   };
 
   return (
-    <div className="p-4 max-w-7xl mx-auto space-y-4 animate-in fade-in duration-500 font-sans">
-      {/* Header */}
-      <div className="flex justify-between items-start">
-        <div>
-          <h1 className="text-[28px] font-bold text-text-strong tracking-tight flex items-center gap-2">
-            Triggers <span className="text-xs font-semibold px-2.5 py-1 bg-purple-50 dark:bg-purple-950/30 text-[#6A38EB] dark:text-purple-300 rounded-full border border-purple-100 dark:border-purple-900 shadow-sm">The Brain</span>
-          </h1>
-          <p className="text-text-secondary mt-1 text-sm md:text-base">
-            Configure the logic engine to define what Snowflake efficiency violations look like.
-          </p>
-        </div>
-        <button 
-          onClick={handleOpenSidePanel}
-          className="flex items-center gap-2 px-5 py-2.5 bg-[#6A38EB] hover:bg-[#582ed1] text-white rounded-full font-semibold transition-all shadow-lg shadow-primary/20"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Create trigger</span>
-        </button>
-      </div>
-
-      {/* Conceptual Explanation banner */}
-      <div className="bg-gradient-to-r from-[#6A38EB]/5 to-[#5829D6]/5 dark:from-[#6A38EB]/10 dark:to-slate-900 border border-purple-100/80 dark:border-slate-800 rounded-2xl p-5 grid grid-cols-1 md:grid-cols-3 gap-6 shadow-sm">
-        <div className="space-y-1.5 md:border-r border-slate-200/60 dark:border-slate-800/80 md:pr-4">
-          <div className="flex items-center gap-2">
-            <span className="p-1 px-2 rounded bg-[#6A38EB]/10 text-[#6A38EB] text-[10px] font-black uppercase">Configuration</span>
-            <h4 className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">The Logic Engine</h4>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Define what a <b>violation</b> looks like. For example: <i>"If a warehouse sits idle for more than 5 minutes with zero connections, classify as a Vampire Burn."</i>
-          </p>
-        </div>
-
-        <div className="space-y-1.5 md:border-r border-slate-200/60 dark:border-slate-800/80 md:pr-4">
-          <div className="flex items-center gap-2">
-            <span className="p-1 px-2 rounded bg-green-500/10 text-green-600 dark:text-green-400 text-[10px] font-black uppercase">Autonomous</span>
-            <h4 className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Self-Healing Execution</h4>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            If a violation triggers under <b>Autonomous Mode</b>, Anavsan immediately runs the corrective routine to fix it without requiring human validation.
-          </p>
-        </div>
-
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2">
-            <span className="p-1 px-2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase">Guided</span>
-            <h4 className="text-xs font-black text-slate-800 dark:text-slate-100 uppercase tracking-widest">Human-In-The-Loop</h4>
-          </div>
-          <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
-            Under <b>Guided Mode</b>, violations generate smart insights and are dispatched to the <b>Enforcement Desk</b> for quick 1-click approvals.
-          </p>
-        </div>
-      </div>
-
-      {/* Top Pills */}
-      <div className="flex flex-wrap items-center gap-3 overflow-x-auto no-scrollbar flex-shrink-0">
-        <KPILabel label="Total Triggers" value={`${policies.length}`} />
-        <KPILabel label="Autonomous" value={`${policies.filter(p => p.governanceMode === 'Autonomous').length}`} />
-        <KPILabel label="Guided" value={`${policies.filter(p => p.governanceMode === 'Guided').length}`} />
-        <KPILabel label="Total Actions Taken" value="1,284" />
-      </div>
-
-      {/* Search Bar header */}
-      <div className="flex flex-wrap gap-4 justify-between items-center bg-white p-4 rounded-xl border border-border-light shadow-sm bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800">
-        <span className="text-[14px] font-bold text-text-muted">Active trigger rules</span>
-        <div className="relative">
-          <Search className="w-4 h-4 text-text-muted absolute left-3 top-1/2 -translate-y-1/2 cursor-text" />
-          <input 
-            type="text"
-            placeholder="Search triggers..."
-            className="pl-9 pr-4 py-2 border border-border-light rounded-xl text-sm font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none placeholder:text-text-muted w-64 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-800 dark:text-white transition-all text-left"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-
-      {/* Grid Section with custom Trigger Occurrences Side Logs Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
-        {/* Left pane: policy trigger grid list */}
-        <div className="lg:col-span-7 space-y-4">
-          <div className="grid grid-cols-1 gap-4">
-            {filteredPolicies.map((policy) => (
-              <div 
-                key={policy.id} 
-                onClick={() => {
-                  setSelectedPolicyId(policy.id);
-                  setIsLogDrawerOpen(true);
-                }}
-                className="cursor-pointer font-sans"
-              >
-                <PolicyCard 
-                  policy={policy} 
-                  isSelected={selectedPolicyId === policy.id}
-                  onSettings={(p) => {
-                    setSelectedBlueprint(p.id);
-                    setGovernanceMode(p.governanceMode);
-                    setWizardStep('config');
-                    setIsSidePanelOpen(true);
-                  }}
-                  onDelete={handleDeletePolicy}
-                />
-              </div>
-            ))}
-          </div>
-          {filteredPolicies.length === 0 && (
-            <div className="py-16 text-center text-text-muted text-sm font-semibold bg-white dark:bg-slate-900 rounded-2xl border border-border-light dark:border-slate-850 shadow-sm">
-              No policies found matching your search.
+    <div className="flex h-full w-full overflow-hidden bg-background font-sans">
+      {/* Scrollable Left Pane */}
+      <div className="flex-1 overflow-y-auto bg-[#F4F1F9] dark:bg-slate-950 no-scrollbar animate-in fade-in duration-505">
+        <div className="max-w-[1000px] w-full mx-auto px-4 py-8 flex flex-col gap-5">
+          {/* Header */}
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-[28px] font-bold text-text-strong tracking-tight flex items-center gap-2">
+                Triggers
+              </h1>
+              <p className="text-text-secondary mt-1 text-sm md:text-base">
+                Define and automate responses to performance and cost inefficiencies across your Snowflake environment.
+              </p>
             </div>
-          )}
-        </div>
+            <button 
+              onClick={handleOpenSidePanel}
+              className="flex items-center gap-2 px-5 py-2.5 bg-[#6A38EB] hover:bg-[#582ed1] text-white rounded-full font-semibold transition-all shadow-lg shadow-primary/20"
+            >
+              <Plus className="w-5 h-5" />
+              <span>Create trigger</span>
+            </button>
+          </div>
 
-        {/* Right pane: list when the trigger happened with relevant details for log (Hidden on small screens, shown inline on desktop) */}
-        <div className="hidden lg:block lg:col-span-5">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[24px] p-5 shadow-sm space-y-4 sticky top-16">
-            {renderLogContent()}
+          {/* Top Pills */}
+          <div className="flex flex-wrap items-center gap-3 overflow-x-auto no-scrollbar flex-shrink-0">
+            <KPILabel label="Total Triggers" value={`${policies.length}`} />
+            <KPILabel label="Autonomous" value={`${policies.filter(p => p.governanceMode === 'Autonomous').length}`} />
+            <KPILabel label="Guided" value={`${policies.filter(p => p.governanceMode === 'Guided').length}`} />
+            <KPILabel label="Total Credits Saved" value="1,284" />
+          </div>
+
+          {/* Refined Filter and Search Row */}
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
+            {/* Filter Pills of target scope, mode, status */}
+            <div className="flex flex-wrap items-center gap-2.5">
+              {/* Scope Dropdown */}
+              <div className="relative">
+                <button 
+                  onClick={() => {
+                    setIsScopeOpen(!isScopeOpen);
+                    setIsModeOpen(false);
+                    setIsStatusOpen(false);
+                  }}
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+                >
+                  <Globe className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <span className="text-[13px]">Scope: <span className="font-bold text-[#6A38EB] dark:text-purple-400">{scopeFilter}</span></span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+                </button>
+                
+                {isScopeOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsScopeOpen(false)} />
+                    <div className="absolute left-0 mt-2 w-52 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-xl py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                      {['All', 'Dev Warehouses', 'Analyst Role', 'ETL Warehouses', 'Staging Tables', 'Marketing Account'].map((scope) => (
+                        <button
+                          key={scope}
+                          onClick={() => {
+                            setScopeFilter(scope);
+                            setIsScopeOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/60 first:rounded-t-xl last:rounded-b-xl transition-all ${
+                            scopeFilter === scope ? 'text-[#6A38EB] dark:text-purple-400 bg-purple-50/40 dark:bg-purple-950/20' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          {scope}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Mode Dropdown */}
+              <div className="relative">
+                <button 
+                  onClick={() => {
+                    setIsModeOpen(!isModeOpen);
+                    setIsScopeOpen(false);
+                    setIsStatusOpen(false);
+                  }}
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+                >
+                  <Tag className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <span className="text-[13px]">Mode: <span className="font-bold text-[#6A38EB] dark:text-purple-400">{modeFilter}</span></span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+                </button>
+                
+                {isModeOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsModeOpen(false)} />
+                    <div className="absolute left-0 mt-2 w-44 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-xl py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                      {['All', 'Autonomous', 'Guided'].map((mode) => (
+                        <button
+                          key={mode}
+                          onClick={() => {
+                            setModeFilter(mode);
+                            setIsModeOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/60 first:rounded-t-xl last:rounded-b-xl transition-all ${
+                            modeFilter === mode ? 'text-[#6A38EB] dark:text-purple-400 bg-purple-50/40 dark:bg-purple-950/20' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          {mode}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Status Dropdown */}
+              <div className="relative">
+                <button 
+                  onClick={() => {
+                    setIsStatusOpen(!isStatusOpen);
+                    setIsScopeOpen(false);
+                    setIsModeOpen(false);
+                  }}
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+                >
+                  <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <span className="text-[13px]">Status: <span className="font-bold text-[#6A38EB] dark:text-purple-400">{statusFilter}</span></span>
+                  <ChevronDown className="w-3.5 h-3.5 text-slate-400 ml-0.5" />
+                </button>
+                
+                {isStatusOpen && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setIsStatusOpen(false)} />
+                    <div className="absolute left-0 mt-2 w-44 bg-white dark:bg-slate-900 border border-slate-150 dark:border-slate-800 rounded-2xl shadow-xl py-1.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150 text-left">
+                      {['All', 'Active', 'Paused'].map((status) => (
+                        <button
+                          key={status}
+                          onClick={() => {
+                            setStatusFilter(status);
+                            setIsStatusOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800/60 first:rounded-t-xl last:rounded-b-xl transition-all ${
+                            statusFilter === status ? 'text-[#6A38EB] dark:text-purple-400 bg-purple-50/40 dark:bg-purple-950/20' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          {status}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Pill Search Button Right */}
+            <div className="relative w-full md:w-72">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 cursor-text" />
+              <input 
+                type="text"
+                placeholder="Search triggers..."
+                className="pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#6A38EB]/20 focus:border-[#6A38EB] placeholder:text-slate-400 w-full text-left font-sans text-slate-800 dark:text-white transition-all shadow-sm"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+          </div>
+
+          {/* Grid Section displaying policies as a stunning single-column stack */}
+          <div className="pt-2">
+            <div className="grid grid-cols-1 gap-6">
+              {filteredPolicies.map((policy) => (
+                <div 
+                  key={policy.id} 
+                  onClick={() => {
+                    setSelectedPolicyId(policy.id);
+                    setIsDetailsOpen(true);
+                  }}
+                  className="cursor-pointer font-sans transition-transform duration-200 hover:-translate-y-0.5"
+                >
+                  <PolicyCard 
+                    policy={policy} 
+                    isSelected={selectedPolicyId === policy.id && isDetailsOpen}
+                    onSettings={(p) => {
+                      setSelectedBlueprint(p.id);
+                      setGovernanceMode(p.governanceMode);
+                      setWizardStep('config');
+                      setIsSidePanelOpen(true);
+                    }}
+                    onDelete={handleDeletePolicy}
+                  />
+                </div>
+              ))}
+            </div>
+            {filteredPolicies.length === 0 && (
+              <div className="py-16 text-center text-text-muted text-sm font-semibold bg-white dark:bg-slate-900 rounded-2xl border border-border-light dark:border-slate-850 shadow-sm">
+                No policies found matching your search.
+              </div>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Mobile & Tablet Bottom slide-up sheet drawer for logs */}
+      {/* Slide-over/Docked Details view depending on screen size */}
       <AnimatePresence>
-        {isLogDrawerOpen && (
+        {isDetailsOpen && selectedPolicyId && (
           <>
-            {/* Backdrop layer */}
+            {/* Backdrop layer (Mobile-only) */}
+            {isMobile && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setIsDetailsOpen(false)}
+                className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-[48]"
+              />
+            )}
+            
+            {/* Details panel layer (Docked side-panel on desktop, slide-over overlay on mobile) */}
             <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setIsLogDrawerOpen(false)}
-              className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[48] lg:hidden"
-            />
-            {/* Drawer sheet layer */}
-            <motion.div 
-              initial={{ y: '100%' }}
-              animate={{ y: 0 }}
-              exit={{ y: '100%' }}
-              transition={{ type: 'spring', damping: 26, stiffness: 220 }}
-              className="fixed bottom-0 left-0 right-0 max-h-[85vh] bg-white dark:bg-slate-900 rounded-t-[32px] border-t border-slate-200 dark:border-slate-800 z-[49] lg:hidden flex flex-col overflow-hidden shadow-[0_-8px_30px_rgba(0,0,0,0.12)] p-6"
+              {...(isMobile 
+                ? {
+                    initial: { x: '100%' },
+                    animate: { x: 0 },
+                    exit: { x: '100%' },
+                    transition: { type: 'spring', damping: 26, stiffness: 220 }
+                  }
+                : {
+                    initial: { width: 0, opacity: 0 },
+                    animate: { width: 500, opacity: 1 },
+                    exit: { width: 0, opacity: 0 },
+                    transition: { type: 'spring', damping: 30, stiffness: 220 }
+                  })}
+              className={`${
+                isMobile 
+                  ? 'fixed top-12 right-0 bottom-0 w-[550px] max-w-full z-[49] shadow-[-16px_0_40px_rgba(0,0,0,0.12)] border-l border-slate-150 dark:border-slate-900' 
+                  : 'relative h-full z-auto border-l border-slate-150 dark:border-slate-900 shadow-none'
+              } bg-white dark:bg-slate-950 flex flex-col overflow-hidden flex-shrink-0`}
             >
-              {/* Top Drag Handle Indicator */}
-              <div className="w-12 h-1 bg-slate-200 dark:bg-slate-700 rounded-full mx-auto mb-5 shrink-0" />
-
-              {/* Responsive Drawer Header */}
-              <div className="flex justify-between items-center mb-4 shrink-0">
-                <span className="text-[14px] font-black text-[#6A38EB] dark:text-purple-400 bg-[#6A38EB]/5 dark:bg-[#6A38EB]/10 px-2.5 py-1 rounded-md">
-                  Active trigger logs
-                </span>
+              {/* Drawer Header */}
+              <div className="p-5 border-b border-[#F4F1F9] dark:border-slate-850 bg-slate-50/65 dark:bg-slate-900/40 flex items-center justify-between select-none shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-black tracking-widest text-[#6A38EB] dark:text-purple-400 bg-[#6A38EB]/8 dark:bg-[#6A38EB]/15 px-2.5 py-1 rounded">
+                    Execution History
+                  </span>
+                  <span className={`w-2 h-2 rounded-full ${policies.find(p => p.id === selectedPolicyId)?.status === 'Active' ? 'bg-emerald-500 animate-pulse' : 'bg-slate-455'}`} />
+                </div>
+                
                 <button 
-                  onClick={() => setIsLogDrawerOpen(false)}
-                  className="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 text-xs font-black rounded-full transition-colors"
+                  onClick={() => setIsDetailsOpen(false)}
+                  className="p-1 px-1.5 rounded-lg hover:bg-slate-105 dark:hover:bg-slate-800 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
                 >
-                  Close
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Scrollable content of occurrences */}
-              <div className="flex-1 overflow-y-auto pr-1">
-                {renderLogContent()}
-              </div>
+              {/* Drawer Body (Scrollable content) */}
+              {(() => {
+                const selectedPolicy = policies.find(p => p.id === selectedPolicyId);
+                if (!selectedPolicy) return null;
+                const logs = allTriggerLogs[selectedPolicy.id] || [];
+
+                return (
+                  <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    {/* Title with metadata */}
+                    <div className="space-y-2 text-left pb-4 border-b border-slate-100 dark:border-slate-850">
+                      <h3 className="text-xl font-bold text-slate-900 dark:text-white leading-tight">
+                        {selectedPolicy.name}
+                      </h3>
+                      <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-505">
+                        <span>Target Scope: <b className="text-slate-850 dark:text-slate-300 font-extrabold">{selectedPolicy.targetScope}</b></span>
+                        <span className="text-slate-300 dark:text-slate-700">•</span>
+                        <span className="uppercase text-[#6A38EB] dark:text-purple-400 font-black">{selectedPolicy.governanceMode} MODE</span>
+                        <span className="text-slate-300 dark:text-slate-700">•</span>
+                        <span className="font-semibold">Last execution: {selectedPolicy.lastExecution}</span>
+                      </div>
+                    </div>
+
+                    {/* Timeline History Segment (Events logs) */}
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-[11.5px] font-black text-slate-400 dark:text-slate-505 uppercase tracking-wider text-left">
+                          Historical Executions Logs ({logs.length})
+                        </h4>
+                        <span className="text-[10px] text-slate-400 font-bold">
+                          Auto-execution enabled
+                        </span>
+                      </div>
+
+                      <div className="space-y-3 pr-0.5">
+                        {logs.length === 0 ? (
+                          <div className="py-12 text-center text-slate-400 dark:text-slate-500 text-xs font-semibold border border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/20">
+                            <Clock className="w-8 h-8 mx-auto text-slate-350 mb-2" />
+                            No executions caught yet for this trigger.
+                          </div>
+                        ) : (
+                          logs.map((log) => {
+                            let statusBadgeClass = '';
+                            if (log.status === 'Success' || log.status === 'Action Taken') {
+                              statusBadgeClass = 'bg-emerald-50 dark:bg-emerald-950/25 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-900/30';
+                            } else if (log.status === 'Blocked') {
+                              statusBadgeClass = 'bg-rose-50 dark:bg-rose-950/25 text-rose-700 dark:text-rose-400 border-rose-100 dark:border-rose-900/30';
+                            } else {
+                              statusBadgeClass = 'bg-amber-50 dark:bg-amber-950/25 text-amber-750 dark:text-amber-400 border-amber-100 dark:border-amber-900/30';
+                            }
+
+                            return (
+                              <div 
+                                key={log.id} 
+                                className="border border-slate-100 dark:border-slate-850 rounded-2xl p-4 bg-slate-50/40 dark:bg-slate-900/40 text-left space-y-2.5 animate-in fade-in duration-300"
+                              >
+                                <div className="flex items-center justify-between gap-3">
+                                  <span className="inline-flex items-center gap-1.5 text-[10px] font-bold text-slate-400 dark:text-slate-500">
+                                    <Calendar className="w-3 h-3" />
+                                    {log.timestamp}
+                                  </span>
+                                  <span className={`px-2 py-0.5 text-[8.5px] font-black uppercase tracking-wider rounded border ${statusBadgeClass}`}>
+                                    {log.status}
+                                  </span>
+                                </div>
+
+                                <div>
+                                  <h5 className="text-xs font-black text-slate-800 dark:text-slate-100 leading-snug">
+                                    {log.action}
+                                  </h5>
+                                  <div className="bg-white dark:bg-slate-950 px-2.5 py-1 rounded-lg border border-dashed border-slate-150 dark:border-slate-800 mt-2 text-[10px] font-bold text-emerald-650 dark:text-emerald-400 inline-block">
+                                    {log.saving}
+                                  </div>
+                                </div>
+
+                                <p className="text-[11px] font-medium leading-relaxed text-slate-500 dark:text-slate-400 bg-white/75 dark:bg-slate-950/40 p-2 text-xs rounded-xl border border-slate-100/30 dark:border-slate-850 text-left">
+                                  {log.details}
+                                </p>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </motion.div>
           </>
         )}

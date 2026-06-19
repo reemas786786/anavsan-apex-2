@@ -12,6 +12,8 @@ import {
     spendTrendsData,
 } from '../data/dummyData';
 import { Account, User, BigScreenWidget, Page, Recommendation } from '../types';
+import { safeStorage } from '../utils/safeStorage';
+const localStorage = safeStorage;
 import { DisplayMode } from '../App';
 import { IconDotsVertical, IconChevronDown, IconAdd, IconList, IconInfo, IconSearch, IconCheck, IconSparkles } from '../constants';
 import InfoTooltip from '../components/InfoTooltip';
@@ -19,7 +21,7 @@ import AICommandCenter from '../components/AICommandCenter';
 import OptimizationHealthWidget from '../components/OptimizationHealthWidget';
 
 interface OverviewProps {
-    onSelectAccount: (account: Account) => void;
+    onSelectAccount: (account: Account, initialPage?: string, sourceTab?: string) => void;
     onSelectUser: (user: User) => void;
     accounts: Account[];
     users: User[];
@@ -115,15 +117,15 @@ const SummaryMetricCard: React.FC<{
 const BudgetStatusWidget: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) => {
     const budgetItems = [
         { 
-            label: 'TOTAL BUDGETS', 
+            label: 'Total Budgets', 
             value: '3', 
             tag: 'TOTAL', 
             tagClass: 'bg-blue-50 text-blue-600 border border-blue-100 dark:bg-blue-950/40 dark:text-blue-400 dark:border-blue-900/40', 
-            desc: 'Active monitoring guardrails',
+            desc: 'Active monitoring policies',
             icon: <Target className="w-6 h-6 stroke-[1.25]" />
         },
         { 
-            label: 'HEALTHY', 
+            label: 'Healthy', 
             value: '1', 
             tag: 'STABLE', 
             tagClass: 'bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900/40', 
@@ -131,11 +133,11 @@ const BudgetStatusWidget: React.FC<{ onNavigate: (page: Page) => void }> = ({ on
             icon: <CheckCircle2 className="w-6 h-6 stroke-[1.25]" />
         },
         { 
-            label: 'AT RISK', 
+            label: 'At Risk', 
             value: '2', 
             tag: 'WARNING', 
             tagClass: 'bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-950/45 dark:text-amber-400 dark:border-amber-900/40', 
-            desc: 'Exceeding 80% of budget',
+            desc: 'Exceeding 80% of allocated budget',
             icon: <AlertTriangle className="w-6 h-6 stroke-[1.25]" />
         }
     ];
@@ -451,14 +453,39 @@ const SpendTrendForecastWidget: React.FC<{
         return null;
     };
 
+    const handlePredictiveAdvisorClick = () => {
+        let promptText = '';
+        if (selectedAccountId === 'all') {
+            promptText = "Spend is tracking stable for the selected period. Applying warehouse auto-suspend optimizations will save 1,880 credits. What are the next steps to apply these settings?";
+        } else {
+            const name = selectedAccount?.name || 'Account';
+            const isStable = name.toLowerCase().includes('prod') || name.toLowerCase().includes('analytics') || name.toLowerCase().includes('core');
+            if (isStable) {
+                promptText = `${name} consumption is tracking stable. Applying recommended warehouse suspension will save 450 credits. What are the next steps to start the optimization?`;
+            } else {
+                promptText = `${name} spend is 15% above baseline. Resizing underutilized warehouses will save 450 credits. What are the next steps to start the optimization?`;
+            }
+        }
+        safeStorage.setItem('apex_initial_chat_prompt', promptText);
+        onNavigate('Ask Apex');
+    };
+
     return (
         <div id="spend-trend-forecast-widget" className="bg-surface rounded-[24px] shadow-sm flex flex-col border border-border-light w-full overflow-hidden">
             {/* Header section with actions */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center px-6 py-4 border-b border-border-light gap-3 bg-white dark:bg-[#1F2937]">
                 <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1.5 leading-none">
-                        <h4 className="text-[14px] font-bold text-text-strong">Spend trend with forecast</h4>
-                        <InfoTooltip text="AI-driven cost projection models & budget drift forecast" position="bottom" />
+                        <h4 className="text-[14px] font-bold text-text-strong">
+                            {selectedAccountId === 'all' ? 'Consumption Analysis' : `Consumption: ${selectedAccount?.name}`}
+                        </h4>
+                        <InfoTooltip 
+                            text={selectedAccountId === 'all' 
+                                ? 'Compares actual credit consumption against AI-projected spend based on selected accounts and time ranges. Forecasts are calculated using 90-day historical trends.' 
+                                : `Calculates actual vs. projected spend for ${selectedAccount?.name || 'Account'}. Insights are derived from historical patterns specific to this account's warehouses and services.`
+                            } 
+                            position="bottom" 
+                        />
                     </div>
                 </div>
                 
@@ -647,7 +674,7 @@ const SpendTrendForecastWidget: React.FC<{
                                 style={{ opacity: hoveredDataKey && hoveredDataKey !== 'forecastTotal' ? 0.3 : 1 }}
                             >
                                 <span className="w-2.5 h-2.5 rounded-full bg-[#A78BFA] border border-dashed border-[#818CF8]" />
-                                AI Forecast
+                                Forecast
                             </span>
                         </div>
                     </div>
@@ -718,19 +745,33 @@ const SpendTrendForecastWidget: React.FC<{
                         {/* Sub Metric List */}
                         <div className="space-y-3">
                             <div className="flex justify-between items-center group">
-                                <span className="text-xs text-text-secondary font-medium">Current spend (4 Feb - 3 Mar)</span>
+                                <div className="flex flex-col">
+                                    <span className="text-xs text-text-secondary font-medium">Actual Spend</span>
+                                    <span className="text-[10px] text-text-muted font-medium mt-0.5">(Feb 04 – Mar 03)</span>
+                                </div>
                                 <span className="text-sm font-bold text-text-strong group-hover:text-primary transition-colors font-sans">{formatValue(mtdValue)}</span>
                             </div>
                             <div className="flex justify-between items-center group border-t border-border-light dark:border-white/5 pt-2.5">
-                                <span className="text-xs text-text-secondary font-medium flex items-center gap-1">
-                                    Projected End-of-Month
-                                    <div className="p-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 rounded scale-90 text-[8px] font-black uppercase">AI</div>
-                                </span>
+                                <div className="flex flex-col">
+                                    <span className="text-xs text-text-secondary font-medium flex items-center gap-1">
+                                        Forecasted Spend
+                                        <div className="p-0.5 bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 rounded scale-90 text-[8px] font-black uppercase">AI</div>
+                                    </span>
+                                    <span className="text-[10px] text-text-muted font-medium mt-0.5">Projected total for the selected range.</span>
+                                </div>
                                 <span className="text-sm font-extrabold text-[#6A32D5] dark:text-[#C084FC] font-sans">{formatValue(projectedEOM)}</span>
                             </div>
-                            <div className="border-t border-border-light dark:border-white/5 pt-2.5">
-                                <div className="flex justify-between items-center mb-1">
-                                    <span className="text-xs text-text-secondary font-medium">Budget utilization</span>
+                            <div className="border-t border-border-light dark:border-white/5 pt-2.5 space-y-2">
+                                <div className="flex justify-between items-start mb-1">
+                                    <div className="flex flex-col">
+                                        <span className="text-xs text-text-secondary font-medium">Budget Utilization</span>
+                                        <span className="text-[10px] text-text-muted font-medium mt-0.5">
+                                            {selectedAccountId === 'all' 
+                                                ? 'Percentage of organization limit consumed.' 
+                                                : 'Percentage of account limit consumed.'
+                                            }
+                                        </span>
+                                    </div>
                                     <span className="text-xs font-bold text-text-strong font-sans">{budgetPct}%</span>
                                 </div>
                                 <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden flex">
@@ -745,9 +786,14 @@ const SpendTrendForecastWidget: React.FC<{
                                         style={{ width: `${Math.min(budgetPct, 100)}%` }} 
                                     />
                                 </div>
-                                <p className="text-[9.5px] text-text-muted mt-1 leading-tight font-medium uppercase tracking-tight">
-                                    Organization limit: <strong className="text-text-secondary font-bold">{formatValue(budgetLimit)}</strong>
-                                </p>
+                                <div className="flex justify-between items-center text-[9.5px] text-text-muted mt-1 leading-tight font-medium uppercase tracking-tight">
+                                    <span>
+                                        {selectedAccountId === 'all' ? 'Organization limit:' : 'Account limit:'} <strong className="text-text-secondary font-bold">{formatValue(budgetLimit)}</strong>
+                                    </span>
+                                    <span>
+                                        Remaining Balance: <strong className="text-emerald-600 dark:text-emerald-400 font-extrabold">{formatValue(Math.max(0, budgetLimit - mtdValue))}</strong>
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -768,33 +814,50 @@ const SpendTrendForecastWidget: React.FC<{
                         </div>
                         
                         <div className="space-y-2 pt-0.5">
-                            <div className="flex items-center justify-between text-[11px]">
-                                <span className="font-bold text-text-strong block truncate max-w-[140px]">Vampire Burn (Idle WH)</span>
-                                <span className="px-1.5 py-0.5 text-[8.5px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded uppercase tracking-wider">
-                                    Pending Review
-                                </span>
-                            </div>
-                            
-                            <div className="flex items-center justify-between text-[11px] border-t border-border-light/50 dark:border-white/5 pt-2">
-                                <span className="font-bold text-text-strong block truncate max-w-[140px]">Bad Join Query Rule</span>
-                                <span className="px-1.5 py-0.5 text-[8.5px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-[#34D399] rounded uppercase tracking-wider">
-                                    Merged & verifying
-                                </span>
-                            </div>
+                            {selectedAccountId === 'all' ? (
+                                <>
+                                    <div className="flex items-center justify-between text-[11px]">
+                                        <span className="font-bold text-text-strong block truncate max-w-[170px]">Idle Warehouse Optimization</span>
+                                        <span className="px-1.5 py-0.5 text-[8.5px] font-extrabold bg-amber-500/10 text-amber-600 dark:text-amber-400 rounded uppercase tracking-wider">
+                                            In Review
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="flex items-center justify-between text-[11px] border-t border-border-light/50 dark:border-white/5 pt-2">
+                                        <span className="font-bold text-text-strong block truncate max-w-[170px]">SQL Join Refactoring</span>
+                                        <span className="px-1.5 py-0.5 text-[8.5px] font-extrabold bg-emerald-500/10 text-emerald-600 dark:text-[#34D399] rounded uppercase tracking-wider">
+                                            Verifying
+                                        </span>
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="text-[11.5px] text-text-muted text-center py-2.5 font-medium leading-relaxed">
+                                    No active operations for this account.
+                                </div>
+                            )}
                         </div>
                     </div>
 
-                    <div className="p-3.5 bg-purple-500/[0.04] border border-purple-500/10 rounded-xl space-y-1.5 hover:bg-purple-500/[0.07] transition-all duration-300">
+                    <div 
+                        onClick={handlePredictiveAdvisorClick}
+                        className="p-3.5 bg-purple-500/[0.04] border border-purple-500/10 rounded-xl space-y-1.5 hover:bg-purple-500/[0.07] transition-all duration-300 cursor-pointer"
+                    >
                         <div className="flex items-center gap-1">
                             <Sparkles className="w-3.5 h-3.5 text-[#6A32D5] dark:text-[#A78BFA] animate-pulse" />
                             <span className="text-[9px] font-black text-[#5829D6] dark:text-[#C084FC] uppercase tracking-wider">Predictive Advisor</span>
                         </div>
                         <p className="text-[11px] text-slate-600 dark:text-slate-350 leading-relaxed font-medium">
                             {selectedAccountId === 'all' ? (
-                                `"Remaining ${forecastDays} days are expected to track stable. Optimization recommendations on warehouse suspend times will save ~${forecastDays === 7 ? '940' : '1,880'} credits if applied."`
-                            ) : (
-                                `"Remaining ${forecastDays} days for ${selectedAccount?.name || 'this account'} are expected to track stable. Active recommendations will save ~${Math.round((forecastDays === 7 ? 450 : 900) * scaleFactor * 2.5)} credits."`
-                            )}
+                                "Spend is tracking stable for the selected period. Applying warehouse auto-suspend optimizations will save 1,880 credits."
+                            ) : (() => {
+                                const name = selectedAccount?.name || 'Account';
+                                const isStable = name.toLowerCase().includes('prod') || name.toLowerCase().includes('analytics') || name.toLowerCase().includes('core');
+                                if (isStable) {
+                                    return `${name} consumption is tracking stable. Applying recommended warehouse suspension will save 450 credits.`;
+                                } else {
+                                    return `${name} spend is 15% above baseline. Resizing underutilized warehouses will save 450 credits.`;
+                                }
+                            })()}
                         </p>
                     </div>
                 </div>
