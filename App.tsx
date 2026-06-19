@@ -507,6 +507,8 @@ const App: React.FC = () => {
   }, [theme]);
   
   const handleLogout = () => {
+    (window as any).__anavsan_aiagent_loaded = false;
+    (window as any).__anavsan_overview_loaded = false;
     setIsAuthenticated(false);
     safeStorage.removeItem('anavsan_auth');
     safeStorage.removeItem('anavsan_user');

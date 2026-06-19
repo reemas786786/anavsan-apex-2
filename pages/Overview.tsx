@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import { Zap, TrendingUp, AlertTriangle, CheckCircle2, CreditCard, Sparkles, ArrowRight, Target, Lightbulb, TrendingUp as TrendIcon, Calendar, Percent, Clock } from 'lucide-react';
+import { Zap, AlertTriangle, CheckCircle2, CreditCard, Sparkles, ArrowRight, Target, Lightbulb, Calendar, Percent, Clock } from 'lucide-react';
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 
 import { 
@@ -971,7 +971,162 @@ const AIOptimizationCard: React.FC<{
     );
 };
 
+const OverviewSkeleton: React.FC = () => {
+    return (
+        <div className="flex flex-col gap-5 animate-in fade-in duration-300">
+            {/* 1. Optimization Health Widget Skeleton */}
+            <div className="bg-surface p-6 rounded-[24px] border border-border-light flex flex-col gap-4">
+                <div className="flex justify-between items-center pb-2 border-b border-border-light/40">
+                    <div className="flex items-center gap-2">
+                        <div className="h-4.5 w-40 rounded-full animate-shimmer" />
+                        <div className="h-4 w-4 rounded-full animate-shimmer" />
+                    </div>
+                    <div className="h-7 w-32 rounded-full animate-shimmer" />
+                </div>
+                {/* Simulated rows of accounts list */}
+                <div className="space-y-3 mt-1">
+                    {[1, 2, 3].map((idx) => (
+                        <div key={idx} className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-2xl border border-slate-100 dark:border-slate-800/65 bg-surface-nested/30 gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="w-9 h-9 rounded-full animate-shimmer flex-shrink-0" />
+                                <div className="space-y-1.5">
+                                    <div className="h-4 w-28 rounded-md animate-shimmer" />
+                                    <div className="h-3 w-16 rounded-md animate-shimmer" />
+                                </div>
+                            </div>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8 flex-1 max-w-xl md:ml-auto">
+                                {[1, 2, 3, 4].map((col) => (
+                                    <div key={col} className="space-y-1.5">
+                                        <div className="h-3 w-12 rounded animate-shimmer" />
+                                        <div className="h-4 w-10 rounded animate-shimmer" />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* 2. Spend Trend & Cost Intelligence Chart Widget Skeleton */}
+            <div className="bg-surface p-6 rounded-[24px] border border-border-light flex flex-col gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-border-light/40">
+                    <div className="flex items-center gap-2">
+                        <div className="h-4.5 w-48 rounded-full animate-shimmer" />
+                        <div className="h-4 w-4 rounded-full animate-shimmer" />
+                    </div>
+                    <div className="flex gap-2">
+                        <div className="h-8 w-28 rounded-full animate-shimmer" />
+                        <div className="h-8 w-24 rounded-full animate-shimmer" />
+                    </div>
+                </div>
+                {/* Simulated large chart area */}
+                <div className="h-[260px] w-full rounded-2xl bg-surface-nested/30 border border-slate-100 dark:border-slate-800/50 p-6 flex flex-col justify-between overflow-hidden relative">
+                    <div className="flex justify-between items-start">
+                        <div className="space-y-1.5">
+                            <div className="h-3 w-20 rounded animate-shimmer" />
+                            <div className="h-5 w-16 rounded animate-shimmer" />
+                        </div>
+                        <div className="flex gap-3">
+                            <div className="h-3 w-10 rounded animate-shimmer" />
+                            <div className="h-3 w-10 rounded animate-shimmer" />
+                        </div>
+                    </div>
+                    {/* Simulated SVG Wave Line representing the cost chart line */}
+                    <div className="absolute inset-x-0 bottom-12 h-20 opacity-30">
+                        <svg className="w-full h-full" preserveAspectRatio="none" viewBox="0 0 100 100">
+                            <path 
+                                d="M0,60 Q15,45 30,70 T60,35 T90,55 T100,40" 
+                                fill="none" 
+                                stroke="#6A32D5" 
+                                strokeWidth="2.5" 
+                                className="stroke-slate-300 dark:stroke-slate-700"
+                            />
+                        </svg>
+                    </div>
+                    <div className="flex justify-between border-t border-slate-100 dark:border-slate-800/80 pt-4 mt-auto">
+                        {[1, 2, 3, 4, 5, 6].map((idx) => (
+                            <div key={idx} className="h-3 w-8 rounded animate-shimmer" />
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            {/* 3. Budget Status Widget Skeleton */}
+            <div className="bg-surface rounded-[24px] border border-border-light flex flex-col overflow-hidden">
+                <div className="flex justify-between items-center px-5 py-4 border-b border-border-light bg-white dark:bg-[#1F2937]">
+                    <div className="flex items-center gap-1.5">
+                        <div className="h-4.5 w-32 rounded-full animate-shimmer" />
+                        <div className="h-4 w-4 rounded-full animate-shimmer" />
+                    </div>
+                    <div className="h-3.5 w-12 rounded animate-shimmer" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-border-light dark:divide-white/5 bg-transparent">
+                    {[1, 2, 3].map((idx) => (
+                        <div key={idx} className="flex justify-between items-center p-5 bg-transparent gap-4">
+                            <div className="space-y-3 flex-grow text-left">
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                    <div className="h-3 w-16 rounded animate-shimmer" />
+                                    <div className="h-3 w-10 rounded animate-shimmer" />
+                                </div>
+                                <div className="space-y-1.5">
+                                    <div className="h-6 w-10 rounded animate-shimmer" />
+                                    <div className="h-3 w-32 rounded animate-shimmer" />
+                                </div>
+                            </div>
+                            <div className="w-7 h-7 rounded-lg animate-shimmer opacity-20 flex-shrink-0" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* 4. AI Command Center / Recommendations Card Skeleton */}
+            <div className="bg-white dark:bg-[#1F2937] p-6 rounded-2xl border border-purple-100 dark:border-purple-900/40 shadow-sm flex flex-col md:grid md:grid-cols-12 gap-6 items-center">
+                <div className="md:col-span-4 w-full flex flex-col justify-center border-b md:border-b-0 md:border-r border-purple-100/50 dark:border-purple-900/20 pb-4 md:pb-0 md:pr-6 h-full gap-2 text-left">
+                    <div className="flex items-center gap-1.5">
+                        <div className="w-4 h-4 rounded animate-shimmer" />
+                        <div className="h-3.5 w-24 rounded animate-shimmer" />
+                        <div className="h-3 w-14 rounded animate-shimmer" />
+                    </div>
+                    <div className="mt-1 space-y-2">
+                        <div className="h-8 w-32 rounded animate-shimmer" />
+                        <div className="h-3 w-28 rounded animate-shimmer" />
+                    </div>
+                </div>
+                <div className="md:col-span-8 w-full flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-left">
+                    <div className="space-y-2.5 flex-1 w-full">
+                        <div className="h-4 w-40 rounded animate-shimmer" />
+                        <div className="space-y-1.5">
+                            <div className="h-3 w-full rounded animate-shimmer" />
+                            <div className="h-3 w-11/12 rounded animate-shimmer" />
+                        </div>
+                    </div>
+                    <div className="h-9 w-28 rounded-full animate-shimmer flex-shrink-0" />
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Overview: React.FC<OverviewProps> = ({ accounts, onSelectAccount, onSelectUser, onAddAccountClick, onNavigate, displayMode = 'credits' }) => {
+    const [isLoading, setIsLoading] = useState(() => !(window as any).__anavsan_overview_loaded);
+
+    useEffect(() => {
+        if (!(window as any).__anavsan_overview_loaded) {
+            const timer = setTimeout(() => {
+                (window as any).__anavsan_overview_loaded = true;
+                setIsLoading(false);
+            }, 1500);
+            return () => clearTimeout(timer);
+        }
+    }, []);
+
+    const handleRefresh = () => {
+        setIsLoading(true);
+        setTimeout(() => {
+            setIsLoading(false);
+        }, 1500);
+    };
+
     const formatCurrency = (credits: number): string => {
         if (displayMode === 'cost') {
             const usd = credits * 3.0;
@@ -1049,17 +1204,24 @@ const Overview: React.FC<OverviewProps> = ({ accounts, onSelectAccount, onSelect
     return (
         <div className="flex flex-col h-full bg-background gap-4 p-4 pb-20 max-w-[1440px] mx-auto overflow-y-auto no-scrollbar">
             <div className="flex justify-between items-end">
-                <div>
+                <div className="flex items-center gap-3">
                     <h1 className="text-[28px] font-bold text-text-strong tracking-tight">Cost Intelligence</h1>
+                    {isLoading && (
+                        <span className="text-xs text-text-muted animate-pulse font-medium">Fetching active warehouse & spend trends...</span>
+                    )}
                 </div>
             </div>
 
-            <div className="flex flex-col gap-4">
-                <OptimizationHealthWidget onNavigate={onNavigate} accounts={accounts} onSelectAccount={onSelectAccount} displayMode={displayMode} />
-                <SpendTrendForecastWidget onNavigate={onNavigate} displayMode={displayMode} accounts={accounts} />
-                <BudgetStatusWidget onNavigate={onNavigate} />
-                <AICommandCenter onNavigate={onNavigate} />
-            </div>
+            {isLoading ? (
+                <OverviewSkeleton />
+            ) : (
+                <div className="flex flex-col gap-4 animate-in fade-in duration-300">
+                    <OptimizationHealthWidget onNavigate={onNavigate} accounts={accounts} onSelectAccount={onSelectAccount} displayMode={displayMode} />
+                    <SpendTrendForecastWidget onNavigate={onNavigate} displayMode={displayMode} accounts={accounts} />
+                    <BudgetStatusWidget onNavigate={onNavigate} />
+                    <AICommandCenter onNavigate={onNavigate} />
+                </div>
+            )}
         </div>
     );
 };

@@ -738,14 +738,6 @@ I have inspected the cost trajectory for active workloads. The ANAVSAN_WH wareho
             Apex may provide inaccurate info. Verify important Snowflake Data Cloud changes.
           </p>
 
-          {/* Shortcut hint button styled exactly with Anavsan interactive violet styles */}
-          <button 
-            onClick={onOpenAgent}
-            className="mt-4 text-[11.5px] text-[#5829D6] hover:text-[#4B1FC0] transition-colors bg-purple-50 hover:bg-purple-100 border border-purple-150 hover:border-purple-200 rounded-xl py-2.5 px-3 text-center w-full font-bold block cursor-pointer"
-          >
-            Want deep autonomous work? → Open Ask APEX Agent
-          </button>
-
         </footer>
       </div>
     </motion.div>

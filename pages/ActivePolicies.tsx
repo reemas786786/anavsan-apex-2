@@ -699,12 +699,39 @@ const PolicyCard: React.FC<{
           {/* Header */}
           <div className="flex justify-between items-start">
             <div>
-              <h1 className="text-[28px] font-bold text-text-strong tracking-tight flex items-center gap-2">
-                Triggers
-              </h1>
-              <p className="text-text-secondary mt-1 text-sm md:text-base">
-                Define and automate responses to performance and cost inefficiencies across your Snowflake environment.
-              </p>
+              <div className="flex items-center gap-2 relative">
+                <h1 className="text-[28px] font-bold text-text-strong tracking-tight">
+                  Triggers
+                </h1>
+                
+                <div className="relative inline-flex items-center group/trig-tooltip">
+                  <button 
+                    className="text-text-muted hover:text-primary transition-colors focus:outline-none p-1 rounded-full cursor-pointer mt-1"
+                    aria-label="Trigger Info"
+                  >
+                    <Info className="w-5 h-5 text-slate-400 dark:text-slate-500 hover:text-[#6A38EB] dark:hover:text-[#a78bfa] transition-colors" />
+                  </button>
+                  <div className="absolute left-0 lg:left-1/2 lg:-translate-x-1/2 top-full mt-1 pt-2 w-80 opacity-0 invisible group-hover/trig-tooltip:opacity-100 group-hover/trig-tooltip:visible transition-all duration-200 z-[100]">
+                    <div className="p-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl text-xs md:text-sm text-text-secondary leading-relaxed flex flex-col gap-2.5">
+                      <div className="font-semibold text-text-strong text-slate-900 dark:text-slate-100">About Snowflake Triggers</div>
+                      <div className="text-slate-600 dark:text-slate-300">
+                        Define and automate responses to performance and cost inefficiencies across your Snowflake environment. Set custom thresholds to auto-resize warehouses, terminate runaway queries, or alert administrators.
+                      </div>
+                      <div className="border-t border-slate-100 dark:border-slate-800/80 pt-2.5 mt-0.5 flex items-center justify-between">
+                        <a 
+                          href="https://docs.snowflake.com" 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 text-xs text-[#6A38EB] hover:text-[#582ed1] dark:text-[#a78bfa] dark:hover:text-[#c084fc] font-semibold transition-colors"
+                        >
+                          <span>View documentation</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
             <button 
               onClick={handleOpenSidePanel}
@@ -726,7 +753,7 @@ const PolicyCard: React.FC<{
           {/* Refined Filter and Search Row */}
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-2">
             {/* Filter Pills of target scope, mode, status */}
-            <div className="flex flex-wrap items-center gap-2.5">
+            <div className="flex flex-wrap items-center gap-2.5 h-10">
               {/* Scope Dropdown */}
               <div className="relative">
                 <button 
@@ -735,7 +762,7 @@ const PolicyCard: React.FC<{
                     setIsModeOpen(false);
                     setIsStatusOpen(false);
                   }}
-                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 h-10 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
                 >
                   <Globe className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <span className="text-[13px]">Scope: <span className="font-bold text-[#6A38EB] dark:text-purple-400">{scopeFilter}</span></span>
@@ -773,7 +800,7 @@ const PolicyCard: React.FC<{
                     setIsScopeOpen(false);
                     setIsStatusOpen(false);
                   }}
-                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 h-10 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
                 >
                   <Tag className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <span className="text-[13px]">Mode: <span className="font-bold text-[#6A38EB] dark:text-purple-400">{modeFilter}</span></span>
@@ -811,7 +838,7 @@ const PolicyCard: React.FC<{
                     setIsScopeOpen(false);
                     setIsModeOpen(false);
                   }}
-                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 py-2 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
+                  className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 hover:border-slate-350 dark:hover:border-slate-700/80 rounded-full px-4 h-10 text-sm font-medium flex items-center gap-1.5 shadow-sm transition-all text-slate-700 dark:text-slate-300 cursor-pointer"
                 >
                   <Shield className="w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <span className="text-[13px]">Status: <span className="font-bold text-[#6A38EB] dark:text-purple-400">{statusFilter}</span></span>
@@ -927,7 +954,7 @@ const PolicyCard: React.FC<{
               } bg-white dark:bg-slate-950 flex flex-col overflow-hidden flex-shrink-0`}
             >
               {/* Drawer Header */}
-              <div className="p-5 border-b border-[#F4F1F9] dark:border-slate-850 bg-slate-50/65 dark:bg-slate-900/40 flex items-center justify-between select-none shrink-0">
+              <div className="py-2.5 px-4 border-b border-[#F4F1F9] dark:border-slate-850 bg-slate-50/65 dark:bg-slate-900/40 flex items-center justify-between select-none shrink-0">
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] font-black tracking-widest text-[#6A38EB] dark:text-purple-400 bg-[#6A38EB]/8 dark:bg-[#6A38EB]/15 px-2.5 py-1 rounded">
                     Execution History
